@@ -12,12 +12,13 @@ object JuezViewBeans {
       .put(VIEW_TYPE_WIDGET_MATERIALSWITCH, "MaterialSwitch")
       .build()
 
-  fun buildClassInfo(id: Int): String = getViewTypeName(id)
+  @JvmStatic fun buildClassInfo(id: Int): String = getViewTypeName(id)
 
-  fun getViewTypeByTypeName(typeName: String): Int = views.inverse().getOrDefault(typeName, 0)
+  @JvmStatic fun getViewTypeByTypeName(typeName: String): Int = views.inverse().getOrDefault(typeName, 0)
 
-  fun getViewTypeName(id: Int): String = views.getOrDefault(id, "")
+  @JvmStatic fun getViewTypeName(id: Int): String = views.getOrDefault(id, "")
 
+  @JvmStatic
   fun getViewTypeResId(id: Int): Int {
     return when (id) {
       VIEW_TYPE_WIDGET_MATERIALSWITCH -> R.drawable.ic_mtrl_toggle
