@@ -1,27 +1,27 @@
 package mod.pranav.viewbinding
 
-import org.w3c.dom.Node
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
+import org.w3c.dom.Node
 
 class ViewBindingBuilder(
-    private val inputFiles: List<File>,
-    private val outputDir: File,
-    private val packageName: String = "dev.pranav.viewbinding"
+  private val inputFiles: List<File>,
+  private val outputDir: File,
+  private val packageName: String = "dev.pranav.viewbinding",
 ) {
-    fun generateBindings() {
-        inputFiles.forEach { generateBindingForLayoutAndWrite(it) }
-    }
-    
-    /** generate binding and return class code */
-    fun generateBindingForLayout(layoutFile: File): String {
-        val name = generateFileNameForLayout(layoutFile.nameWithoutExtension)
-        val rootView = getTopLevelView(layoutFile)
-        val parsed = parseViews(layoutFile)
-        val views =
-            if (parsed.isNotEmpty() && parsed.first() == rootView) parsed.drop(1) else parsed
+  fun generateBindings() {
+    inputFiles.forEach { generateBindingForLayoutAndWrite(it) }
+  }
 
-        val content = """
+  /** generate binding and return class code */
+  fun generateBindingForLayout(layoutFile: File): String {
+    val name = generateFileNameForLayout(layoutFile.nameWithoutExtension)
+    val rootView = getTopLevelView(layoutFile)
+    val parsed = parseViews(layoutFile)
+    val views = if (parsed.isNotEmpty() && parsed.first() == rootView) parsed.drop(1) else parsed
+
+    val content =
+      """
 // Generated file. Do not modify.
 package $packageName;
 
@@ -82,112 +82,119 @@ ${
          return null;
     }
 }
-        """.trimIndent()
+        """
+        .trimIndent()
 
-        return content
-    }
-    
-    /** generate view binding and save in output file */
-    private fun generateBindingForLayoutAndWrite(layoutFile: File) {
-        val name = generateFileNameForLayout(layoutFile.nameWithoutExtension)
-        val file = File(outputDir, "$name.java")
-        val content = generateBindingForLayout(layoutFile)
-        file.writeText(content)
-    }
+    return content
+  }
 
-    private fun generateImports(views: List<View>, rootView: View): String {
-        val copy = views.toMutableSet().filterNot {
-            it.type == "View" || it.type == "ViewGroup"
-        }.distinctBy { it.fullType }
-        val imports = mutableSetOf(
-            "import android.view.View;",
-            "import android.view.LayoutInflater;",
-            "import android.view.ViewGroup;",
-            "import ${rootView.fullType};"
-        )
-        copy.forEach { imports.add("import ${it.fullType};") }
-        return imports.sorted().joinToString("\n")
-    }
+  /** generate view binding and save in output file */
+  private fun generateBindingForLayoutAndWrite(layoutFile: File) {
+    val name = generateFileNameForLayout(layoutFile.nameWithoutExtension)
+    val file = File(outputDir, "$name.java")
+    val content = generateBindingForLayout(layoutFile)
+    file.writeText(content)
+  }
 
-    private fun getTopLevelView(layoutFile: File): View {
-        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(layoutFile)
-        val element = document.documentElement
-        return View(
-            element.nodeName.substringAfterLast("."),
-            if (element.nodeName.contains(".")) element.nodeName else "android.widget.${element.nodeName}",
-            element.attributes?.getNamedItem("android:id")?.nodeValue?.substringAfter("/")
-                ?: "rootView"
-        )
-    }
+  private fun generateImports(views: List<View>, rootView: View): String {
+    val copy =
+      views
+        .toMutableSet()
+        .filterNot { it.type == "View" || it.type == "ViewGroup" }
+        .distinctBy { it.fullType }
+    val imports =
+      mutableSetOf(
+        "import android.view.View;",
+        "import android.view.LayoutInflater;",
+        "import android.view.ViewGroup;",
+        "import ${rootView.fullType};",
+      )
+    copy.forEach { imports.add("import ${it.fullType};") }
+    return imports.sorted().joinToString("\n")
+  }
 
-    private fun parseViews(layoutFile: File): List<View> {
-        val views = mutableListOf<View>()
-        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(layoutFile)
-        parseNode(document.documentElement, views)
-        return (views.filterNot { it.isInclude } + views.filter { it.isInclude })
-    }
+  private fun getTopLevelView(layoutFile: File): View {
+    val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(layoutFile)
+    val element = document.documentElement
+    return View(
+      element.nodeName.substringAfterLast("."),
+      if (element.nodeName.contains(".")) element.nodeName
+      else "android.widget.${element.nodeName}",
+      element.attributes?.getNamedItem("android:id")?.nodeValue?.substringAfter("/") ?: "rootView",
+    )
+  }
 
-    private fun parseNode(node: Node, views: MutableList<View>) {
-        if (node.nodeType == Node.ELEMENT_NODE) {
+  private fun parseViews(layoutFile: File): List<View> {
+    val views = mutableListOf<View>()
+    val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(layoutFile)
+    parseNode(document.documentElement, views)
+    return (views.filterNot { it.isInclude } + views.filter { it.isInclude })
+  }
+
+  private fun parseNode(node: Node, views: MutableList<View>) {
+    if (node.nodeType == Node.ELEMENT_NODE) {
+      val id = node.attributes?.getNamedItem("android:id")
+      if (id != null) {
+        if (node.nodeName == "include") {
+          val layout = node.attributes?.getNamedItem("layout")?.nodeValue?.substringAfter("/")
+          if (layout != null) {
             val id = node.attributes?.getNamedItem("android:id")
             if (id != null) {
-                if (node.nodeName == "include") {
-                    val layout =
-                        node.attributes?.getNamedItem("layout")?.nodeValue?.substringAfter("/")
-                    if (layout != null) {
-                        val id = node.attributes?.getNamedItem("android:id")
-                        if (id != null) {
-                            views.add(
-                                View(
-                                    generateFileNameForLayout(layout),
-                                    packageName + "." + generateFileNameForLayout(layout),
-                                    id.nodeValue.substringAfter("/"),
-                                    true
-                                )
-                            )
-                        }
-                    }
-                } else {
-                    views.add(
-                        View(
-                            node.nodeName.substringAfterLast("."),
-                            if (node.nodeName.contains(".")) node.nodeName else "android.widget.${node.nodeName}",
-                            id.nodeValue.substringAfter("/")
-                        )
-                    )
-                }
+              views.add(
+                View(
+                  generateFileNameForLayout(layout),
+                  packageName + "." + generateFileNameForLayout(layout),
+                  id.nodeValue.substringAfter("/"),
+                  true,
+                )
+              )
             }
-            for (i in 0 until node.childNodes.length) {
-                parseNode(node.childNodes.item(i), views)
-            }
+          }
+        } else {
+          views.add(
+            View(
+              node.nodeName.substringAfterLast("."),
+              if (node.nodeName.contains(".")) node.nodeName else "android.widget.${node.nodeName}",
+              id.nodeValue.substringAfter("/"),
+            )
+          )
         }
+      }
+      for (i in 0 until node.childNodes.length) {
+        parseNode(node.childNodes.item(i), views)
+      }
+    }
+  }
+
+  data class View(
+    val type: String,
+    val fullType: String,
+    val id: String,
+    val isInclude: Boolean = false,
+  ) {
+    val name = generateParameterFromId(id)
+
+    override fun toString(): String {
+      return "${type}(fullName='$fullType', id='$id', name='$name', isInclude=$isInclude)"
+    }
+  }
+
+  companion object {
+    @JvmStatic
+    fun generateParameterFromId(id: String): String {
+      return if (id.contains('_'))
+        id.substringBefore('_') +
+          id.substringAfter('_').split('_').joinToString("") { part ->
+            part.replaceFirstChar { it.uppercaseChar() }
+          }
+      else id
     }
 
-    data class View(
-        val type: String,
-        val fullType: String,
-        val id: String,
-        val isInclude: Boolean = false
-    ) {
-        val name = generateParameterFromId(id)
-
-        override fun toString(): String {
-            return "${type}(fullName='$fullType', id='$id', name='$name', isInclude=$isInclude)"
-        }
+    @JvmStatic
+    fun generateFileNameForLayout(layoutName: String): String {
+      return layoutName.split('_').joinToString("") { part ->
+        part.replaceFirstChar { it.uppercaseChar() }
+      } + "Binding"
     }
-
-    companion object {
-        @JvmStatic
-        fun generateParameterFromId(id: String): String {
-            return if (id.contains('_')) id.substringBefore('_') + id.substringAfter('_')
-                .split('_')
-                .joinToString("") { part -> part.replaceFirstChar { it.uppercaseChar() } } else id
-        }
-
-        @JvmStatic
-        fun generateFileNameForLayout(layoutName: String): String {
-            return layoutName.split('_')
-                .joinToString("") { part -> part.replaceFirstChar { it.uppercaseChar() } } + "Binding"
-        }
-    }
+  }
 }

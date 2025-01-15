@@ -7,17 +7,16 @@ import pro.sketchware.R
 object JuezViewBeans {
   const val VIEW_TYPE_WIDGET_MATERIALSWITCH = 49
 
-  val views: BiMap<Int, String> = ImmutableBiMap.builder<Int, String>()
-    .put(VIEW_TYPE_WIDGET_MATERIALSWITCH, "MaterialSwitch")
-    .build()
+  val views: BiMap<Int, String> =
+    ImmutableBiMap.builder<Int, String>()
+      .put(VIEW_TYPE_WIDGET_MATERIALSWITCH, "MaterialSwitch")
+      .build()
 
   fun buildClassInfo(id: Int): String = getViewTypeName(id)
 
-  fun getViewTypeByTypeName(typeName: String): Int = 
-    views.inverse().getOrDefault(typeName, 0)
+  fun getViewTypeByTypeName(typeName: String): Int = views.inverse().getOrDefault(typeName, 0)
 
-  fun getViewTypeName(id: Int): String = 
-    views.getOrDefault(id, "")
+  fun getViewTypeName(id: Int): String = views.getOrDefault(id, "")
 
   fun getViewTypeResId(id: Int): Int {
     return when (id) {

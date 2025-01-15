@@ -11,7 +11,7 @@ class JuezViewCreator(private val context: Context) {
   fun create(bean: ViewBean): View {
     return when (bean.type) {
       JuezViewBeans.VIEW_TYPE_WIDGET_MATERIALSWITCH -> ItemMaterialSwitch(context)
-      else -> ViewPane.getUnknownItemView(context, bean);
+      else -> ViewPane.getUnknownItemView(context, bean)
     }
   }
 }
