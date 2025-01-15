@@ -19,74 +19,75 @@ package mod.agus.jcoderz.dx.cf.attrib;
 import mod.agus.jcoderz.dx.rop.cst.ConstantPool;
 import mod.agus.jcoderz.dx.util.ByteArray;
 
-/**
- * Raw attribute, for holding onto attributes that are unrecognized.
- */
+/** Raw attribute, for holding onto attributes that are unrecognized. */
 public final class RawAttribute extends BaseAttribute {
-    /** {@code non-null;} attribute data */
-    private final mod.agus.jcoderz.dx.util.ByteArray data;
+  /** {@code non-null;} attribute data */
+  private final mod.agus.jcoderz.dx.util.ByteArray data;
 
-    /**
-     * {@code null-ok;} constant pool to use for resolution of cpis in {@link
-     * #data}
-     */
-    private final mod.agus.jcoderz.dx.rop.cst.ConstantPool pool;
+  /** {@code null-ok;} constant pool to use for resolution of cpis in {@link #data} */
+  private final mod.agus.jcoderz.dx.rop.cst.ConstantPool pool;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param name {@code non-null;} attribute name
-     * @param data {@code non-null;} attribute data
-     * @param pool {@code null-ok;} constant pool to use for cpi resolution
-     */
-    public RawAttribute(String name, mod.agus.jcoderz.dx.util.ByteArray data, mod.agus.jcoderz.dx.rop.cst.ConstantPool pool) {
-        super(name);
+  /**
+   * Constructs an instance.
+   *
+   * @param name {@code non-null;} attribute name
+   * @param data {@code non-null;} attribute data
+   * @param pool {@code null-ok;} constant pool to use for cpi resolution
+   */
+  public RawAttribute(
+      String name,
+      mod.agus.jcoderz.dx.util.ByteArray data,
+      mod.agus.jcoderz.dx.rop.cst.ConstantPool pool) {
+    super(name);
 
-        if (data == null) {
-            throw new NullPointerException("data == null");
-        }
-
-        this.data = data;
-        this.pool = pool;
+    if (data == null) {
+      throw new NullPointerException("data == null");
     }
 
-    /**
-     * Constructs an instance from a sub-array of a {@link mod.agus.jcoderz.dx.util.ByteArray}.
-     *
-     * @param name {@code non-null;} attribute name
-     * @param data {@code non-null;} array containing the attribute data
-     * @param offset offset in {@code data} to the attribute data
-     * @param length length of the attribute data, in bytes
-     * @param pool {@code null-ok;} constant pool to use for cpi resolution
-     */
-    public RawAttribute(String name, mod.agus.jcoderz.dx.util.ByteArray data, int offset,
-                        int length, mod.agus.jcoderz.dx.rop.cst.ConstantPool pool) {
-        this(name, data.slice(offset, offset + length), pool);
-    }
+    this.data = data;
+    this.pool = pool;
+  }
 
-    /**
-     * Get the raw data of the attribute.
-     *
-     * @return {@code non-null;} the data
-     */
-    public ByteArray getData() {
-        return data;
-    }
+  /**
+   * Constructs an instance from a sub-array of a {@link mod.agus.jcoderz.dx.util.ByteArray}.
+   *
+   * @param name {@code non-null;} attribute name
+   * @param data {@code non-null;} array containing the attribute data
+   * @param offset offset in {@code data} to the attribute data
+   * @param length length of the attribute data, in bytes
+   * @param pool {@code null-ok;} constant pool to use for cpi resolution
+   */
+  public RawAttribute(
+      String name,
+      mod.agus.jcoderz.dx.util.ByteArray data,
+      int offset,
+      int length,
+      mod.agus.jcoderz.dx.rop.cst.ConstantPool pool) {
+    this(name, data.slice(offset, offset + length), pool);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return data.size() + 6;
-    }
+  /**
+   * Get the raw data of the attribute.
+   *
+   * @return {@code non-null;} the data
+   */
+  public ByteArray getData() {
+    return data;
+  }
 
-    /**
-     * Gets the constant pool to use for cpi resolution, if any. It
-     * presumably came from the class file that this attribute came
-     * from.
-     *
-     * @return {@code null-ok;} the constant pool
-     */
-    public ConstantPool getPool() {
-        return pool;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return data.size() + 6;
+  }
+
+  /**
+   * Gets the constant pool to use for cpi resolution, if any. It presumably came from the class
+   * file that this attribute came from.
+   *
+   * @return {@code null-ok;} the constant pool
+   */
+  public ConstantPool getPool() {
+    return pool;
+  }
 }

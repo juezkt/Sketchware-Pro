@@ -18,180 +18,184 @@ package mod.agus.jcoderz.dx.rop.cst;
 
 import mod.agus.jcoderz.dx.rop.type.Type;
 
-/**
- * Constants of type {@code MethodHandle}.
- */
+/** Constants of type {@code MethodHandle}. */
 public final class CstMethodHandle extends TypedConstant {
 
-    public static final int METHOD_HANDLE_TYPE_STATIC_PUT = 0;
-    public static final int METHOD_HANDLE_TYPE_STATIC_GET = 1;
-    public static final int METHOD_HANDLE_TYPE_INSTANCE_PUT = 2;
-    public static final int METHOD_HANDLE_TYPE_INSTANCE_GET = 3;
+  public static final int METHOD_HANDLE_TYPE_STATIC_PUT = 0;
+  public static final int METHOD_HANDLE_TYPE_STATIC_GET = 1;
+  public static final int METHOD_HANDLE_TYPE_INSTANCE_PUT = 2;
+  public static final int METHOD_HANDLE_TYPE_INSTANCE_GET = 3;
 
-    public static final int METHOD_HANDLE_TYPE_INVOKE_STATIC = 4;
-    public static final int METHOD_HANDLE_TYPE_INVOKE_INSTANCE = 5;
-    public static final int METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR = 6;
-    public static final int METHOD_HANDLE_TYPE_INVOKE_DIRECT = 7;
-    public static final int METHOD_HANDLE_TYPE_INVOKE_INTERFACE = 8;
+  public static final int METHOD_HANDLE_TYPE_INVOKE_STATIC = 4;
+  public static final int METHOD_HANDLE_TYPE_INVOKE_INSTANCE = 5;
+  public static final int METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR = 6;
+  public static final int METHOD_HANDLE_TYPE_INVOKE_DIRECT = 7;
+  public static final int METHOD_HANDLE_TYPE_INVOKE_INTERFACE = 8;
 
-    private static final String [] TYPE_NAMES = {
-        "static-put", "static-get", "instance-put", "instance-get",
-        "invoke-static", "invoke-instance", "invoke-constructor", "invoke-direct",
-        "invoke-interface"
+  private static final String[] TYPE_NAMES = {
+    "static-put", "static-get", "instance-put", "instance-get",
+    "invoke-static", "invoke-instance", "invoke-constructor", "invoke-direct",
+    "invoke-interface"
+  };
+
+  /** The type of MethodHandle */
+  private final int type;
+
+  /** {@code non-null;} the referenced constant */
+  private final Constant ref;
+
+  /**
+   * Makes an instance for the given value. This may (but does not necessarily) return an
+   * already-allocated instance.
+   *
+   * @param type the type of this handle
+   * @param ref {@code non-null;} the referenced field or method constant
+   * @return {@code non-null;} the appropriate instance
+   */
+  public static CstMethodHandle make(int type, Constant ref) {
+    if (isAccessor(type)) {
+      if (!(ref instanceof CstFieldRef)) {
+        throw new IllegalArgumentException("ref has wrong type: " + ref.getClass());
+      }
+    } else if (isInvocation(type)) {
+      if (!(ref instanceof CstBaseMethodRef)) {
+        throw new IllegalArgumentException("ref has wrong type: " + ref.getClass());
+      }
+    } else {
+      throw new IllegalArgumentException("type is out of range: " + type);
+    }
+    return new CstMethodHandle(type, ref);
+  }
+
+  /**
+   * Constructs an instance. This constructor is private; use {@link #make}.
+   *
+   * @param type the type of this handle
+   * @param ref the actual referenced constant
+   */
+  private CstMethodHandle(int type, Constant ref) {
+    this.type = type;
+    this.ref = ref;
+  }
+
+  /**
+   * Gets the actual constant.
+   *
+   * @return the value
+   */
+  public Constant getRef() {
+    return ref;
+  }
+
+  /**
+   * Gets the type of this method handle.
+   *
+   * @return the type
+   */
+  public int getMethodHandleType() {
+    return type;
+  }
+
+  /**
+   * Reports whether the method handle type is a field accessor.
+   *
+   * @param type the method handle type
+   * @return true if the method handle type is a field accessor, false otherwise
+   */
+  public static boolean isAccessor(int type) {
+    return switch (type) {
+      case METHOD_HANDLE_TYPE_STATIC_PUT,
+              METHOD_HANDLE_TYPE_STATIC_GET,
+              METHOD_HANDLE_TYPE_INSTANCE_PUT,
+              METHOD_HANDLE_TYPE_INSTANCE_GET ->
+          true;
+      default -> false;
     };
+  }
 
-    /** The type of MethodHandle */
-    private final int type;
+  /**
+   * Reports whether the method handle is a field accessor.
+   *
+   * @return true if the method handle is a field accessor, false otherwise
+   */
+  public boolean isAccessor() {
+    return isAccessor(type);
+  }
 
-    /** {@code non-null;} the referenced constant */
-    private final Constant ref;
+  /**
+   * Reports whether the method handle type is a method invocation.
+   *
+   * @param type the method handle type
+   * @return true if the method handle type is a method invocation, false otherwise
+   */
+  public static boolean isInvocation(int type) {
+    return switch (type) {
+      case METHOD_HANDLE_TYPE_INVOKE_STATIC,
+              METHOD_HANDLE_TYPE_INVOKE_INSTANCE,
+              METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR,
+              METHOD_HANDLE_TYPE_INVOKE_DIRECT,
+              METHOD_HANDLE_TYPE_INVOKE_INTERFACE ->
+          true;
+      default -> false;
+    };
+  }
 
-    /**
-     * Makes an instance for the given value. This may (but does not
-     * necessarily) return an already-allocated instance.
-     *
-     * @param type the type of this handle
-     * @param ref {@code non-null;} the referenced field or method constant
-     * @return {@code non-null;} the appropriate instance
-     */
-    public static CstMethodHandle make(int type, Constant ref) {
-        if (isAccessor(type)) {
-            if (!(ref instanceof CstFieldRef)) {
-                throw new IllegalArgumentException("ref has wrong type: " + ref.getClass());
-            }
-        } else if (isInvocation(type)) {
-            if (!(ref instanceof CstBaseMethodRef)) {
-                throw new IllegalArgumentException("ref has wrong type: " + ref.getClass());
-            }
-        } else {
-            throw new IllegalArgumentException("type is out of range: " + type);
-        }
-        return new CstMethodHandle(type, ref);
+  /**
+   * Reports whether the method handle is a method invocation.
+   *
+   * @return true if the method handle is a method invocation, false otherwise
+   */
+  public boolean isInvocation() {
+    return isInvocation(type);
+  }
+
+  /**
+   * Gets a human readable name for a method handle type.
+   *
+   * @param type the method handle type
+   * @return the string representation of the type
+   */
+  public static String getMethodHandleTypeName(final int type) {
+    return TYPE_NAMES[type];
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isCategory2() {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected int compareTo0(Constant other) {
+    CstMethodHandle otherHandle = (CstMethodHandle) other;
+    if (getMethodHandleType() == otherHandle.getMethodHandleType()) {
+      return getRef().compareTo(otherHandle.getRef());
+    } else {
+      return Integer.compare(getMethodHandleType(), otherHandle.getMethodHandleType());
     }
+  }
 
-    /**
-     * Constructs an instance. This constructor is private; use {@link #make}.
-     *
-     * @param type the type of this handle
-     * @param ref the actual referenced constant
-     */
-    private CstMethodHandle(int type, Constant ref) {
-        this.type = type;
-        this.ref = ref;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return "method-handle{" + toHuman() + "}";
+  }
 
-    /**
-     * Gets the actual constant.
-     *
-     * @return the value
-     */
-    public Constant getRef() {
-        return ref;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String typeName() {
+    return "method handle";
+  }
 
-    /**
-     * Gets the type of this method handle.
-     *
-     * @return the type
-     */
-    public int getMethodHandleType() {
-        return type;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String toHuman() {
+    return getMethodHandleTypeName(type) + "," + ref.toString();
+  }
 
-    /**
-     * Reports whether the method handle type is a field accessor.
-     *
-     * @param type the method handle type
-     * @return true if the method handle type is a field accessor, false otherwise
-     */
-    public static boolean isAccessor(int type) {
-        return switch (type) {
-            case METHOD_HANDLE_TYPE_STATIC_PUT, METHOD_HANDLE_TYPE_STATIC_GET,
-                 METHOD_HANDLE_TYPE_INSTANCE_PUT, METHOD_HANDLE_TYPE_INSTANCE_GET -> true;
-            default -> false;
-        };
-    }
-
-    /**
-     * Reports whether the method handle is a field accessor.
-     *
-     * @return true if the method handle is a field accessor, false otherwise
-     */
-    public boolean isAccessor() {
-        return isAccessor(type);
-    }
-
-    /**
-     * Reports whether the method handle type is a method invocation.
-     *
-     * @param type the method handle type
-     * @return true if the method handle type is a method invocation, false otherwise
-     */
-    public static boolean isInvocation(int type) {
-        return switch (type) {
-            case METHOD_HANDLE_TYPE_INVOKE_STATIC, METHOD_HANDLE_TYPE_INVOKE_INSTANCE,
-                 METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR, METHOD_HANDLE_TYPE_INVOKE_DIRECT,
-                 METHOD_HANDLE_TYPE_INVOKE_INTERFACE -> true;
-            default -> false;
-        };
-    }
-
-    /**
-     * Reports whether the method handle is a method invocation.
-     *
-     * @return true if the method handle is a method invocation, false otherwise
-     */
-    public boolean isInvocation() {
-        return isInvocation(type);
-    }
-
-    /**
-     * Gets a human readable name for a method handle type.
-     *
-     * @param type the method handle type
-     * @return the string representation of the type
-     */
-    public static String getMethodHandleTypeName(final int type) {
-        return TYPE_NAMES[type];
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isCategory2() {
-        return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected int compareTo0(Constant other) {
-        CstMethodHandle otherHandle = (CstMethodHandle) other;
-        if (getMethodHandleType() == otherHandle.getMethodHandleType()) {
-            return getRef().compareTo(otherHandle.getRef());
-        } else {
-            return Integer.compare(getMethodHandleType(), otherHandle.getMethodHandleType());
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return "method-handle{" + toHuman() + "}";
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String typeName() {
-        return "method handle";
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toHuman() {
-        return getMethodHandleTypeName(type)+ "," + ref.toString();
-    }
-
-    @Override
-    public Type getType() {
-        return Type.METHOD_HANDLE;
-    }
+  @Override
+  public Type getType() {
+    return Type.METHOD_HANDLE;
+  }
 }

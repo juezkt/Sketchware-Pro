@@ -11,68 +11,69 @@ import com.besome.sketch.beans.ViewBean;
 
 public class ItemImageView extends AppCompatImageView implements sy {
 
-    public ViewBean viewBean;
+  public ViewBean viewBean;
 
-    public boolean selected;
+  public boolean selected;
 
-    public boolean fixed;
+  public boolean fixed;
 
-    public Paint paint;
+  public Paint paint;
 
-    public float oneDp;
+  public float oneDp;
 
-    public ItemImageView(Context context) {
-        super(context);
-        initialize(context);
+  public ItemImageView(Context context) {
+    super(context);
+    initialize(context);
+  }
+
+  public void initialize(Context context) {
+    this.oneDp = wB.a(context, 1.0f);
+    this.paint = new Paint(1);
+    this.paint.setColor(0x9599d5d0);
+    setDrawingCacheEnabled(true);
+  }
+
+  @Override
+  public ViewBean getBean() {
+    return this.viewBean;
+  }
+
+  @Override
+  public boolean getFixed() {
+    return this.fixed;
+  }
+
+  public boolean getSelection() {
+    return this.selected;
+  }
+
+  @Override
+  public void onDraw(Canvas canvas) {
+    if (this.selected) {
+      canvas.drawRect(new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight()), this.paint);
     }
+    super.onDraw(canvas);
+  }
 
-    public void initialize(Context context) {
-        this.oneDp = wB.a(context, 1.0f);
-        this.paint = new Paint(1);
-        this.paint.setColor(0x9599d5d0);
-        setDrawingCacheEnabled(true);
-    }
+  @Override
+  public void setBean(ViewBean viewBean) {
+    this.viewBean = viewBean;
+  }
 
-    @Override
-    public ViewBean getBean() {
-        return this.viewBean;
-    }
+  public void setFixed(boolean fixed) {
+    this.fixed = fixed;
+  }
 
-    @Override
-    public boolean getFixed() {
-        return this.fixed;
-    }
+  @Override
+  public void setPadding(int left, int top, int right, int bottom) {
+    float oneDp = this.oneDp;
+    super.setPadding(
+        (int) (left * oneDp), (int) (top * oneDp), (int) (right * oneDp), (int) (bottom * oneDp));
+  }
 
-    public boolean getSelection() {
-        return this.selected;
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (this.selected) {
-            canvas.drawRect(new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight()), this.paint);
-        }
-        super.onDraw(canvas);
-    }
-
-    @Override
-    public void setBean(ViewBean viewBean) {
-        this.viewBean = viewBean;
-    }
-
-    public void setFixed(boolean fixed) {
-        this.fixed = fixed;
-    }
-
-    @Override
-    public void setPadding(int left, int top, int right, int bottom) {
-        float oneDp = this.oneDp;
-        super.setPadding((int) (left * oneDp), (int) (top * oneDp), (int) (right * oneDp), (int) (bottom * oneDp));
-    }
-
-    @Override
-    public void setSelection(boolean selected) {
-        this.selected = selected;
-        invalidate();
-    }
+  @Override
+  public void setSelection(boolean selected) {
+    this.selected = selected;
+    invalidate();
+  }
 }

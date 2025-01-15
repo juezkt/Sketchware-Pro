@@ -22,35 +22,36 @@ import mod.agus.jcoderz.dx.rop.cst.CstType;
 import mod.agus.jcoderz.dx.rop.type.Prototype;
 
 /**
- * Standard implementation of {@link mod.agus.jcoderz.dx.cf.iface.Method}, which directly stores
- * all the associated data.
+ * Standard implementation of {@link mod.agus.jcoderz.dx.cf.iface.Method}, which directly stores all
+ * the associated data.
  */
 public final class StdMethod extends StdMember implements Method {
-    /** {@code non-null;} the effective method descriptor */
-    private final mod.agus.jcoderz.dx.rop.type.Prototype effectiveDescriptor;
+  /** {@code non-null;} the effective method descriptor */
+  private final mod.agus.jcoderz.dx.rop.type.Prototype effectiveDescriptor;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param definingClass {@code non-null;} the defining class
-     * @param accessFlags access flags
-     * @param nat {@code non-null;} member name and type (descriptor)
-     * @param attributes {@code non-null;} list of associated attributes
-     */
-    public StdMethod(CstType definingClass, int accessFlags, CstNat nat,
-                     AttributeList attributes) {
-        super(definingClass, accessFlags, nat, attributes);
+  /**
+   * Constructs an instance.
+   *
+   * @param definingClass {@code non-null;} the defining class
+   * @param accessFlags access flags
+   * @param nat {@code non-null;} member name and type (descriptor)
+   * @param attributes {@code non-null;} list of associated attributes
+   */
+  public StdMethod(CstType definingClass, int accessFlags, CstNat nat, AttributeList attributes) {
+    super(definingClass, accessFlags, nat, attributes);
 
-        String descStr = getDescriptor().getString();
-        effectiveDescriptor =
-            mod.agus.jcoderz.dx.rop.type.Prototype.intern(descStr, definingClass.getClassType(),
-                                    AccessFlags.isStatic(accessFlags),
-                                    nat.isInstanceInit());
-    }
+    String descStr = getDescriptor().getString();
+    effectiveDescriptor =
+        mod.agus.jcoderz.dx.rop.type.Prototype.intern(
+            descStr,
+            definingClass.getClassType(),
+            AccessFlags.isStatic(accessFlags),
+            nat.isInstanceInit());
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public Prototype getEffectiveDescriptor() {
-        return effectiveDescriptor;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public Prototype getEffectiveDescriptor() {
+    return effectiveDescriptor;
+  }
 }

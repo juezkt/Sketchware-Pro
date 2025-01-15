@@ -6,16 +6,15 @@ import a.a.a.yq;
 import mod.jbk.build.BuildProgressReceiver;
 
 public class KotlinCompilerBridge {
-    public static void compileKotlinCodeIfPossible(BuildProgressReceiver task, ProjectBuilder builder) throws Throwable {
-    }
+  public static void compileKotlinCodeIfPossible(BuildProgressReceiver task, ProjectBuilder builder)
+      throws Throwable {}
 
-    public static void maybeAddKotlinBuiltInLibraryDependenciesIfPossible(ProjectBuilder builder, BuiltInLibraryManager builtInLibraryManager) {
-    }
+  public static void maybeAddKotlinBuiltInLibraryDependenciesIfPossible(
+      ProjectBuilder builder, BuiltInLibraryManager builtInLibraryManager) {}
 
-    public static void maybeAddKotlinFilesToClasspath(StringBuilder classpath, yq workspace) {
-    }
+  public static void maybeAddKotlinFilesToClasspath(StringBuilder classpath, yq workspace) {}
 
-    public static String getKotlinHome(yq workspace) {
-        return null;
-    }
+  public static String getKotlinHome(yq workspace) {
+    return null;
+  }
 }

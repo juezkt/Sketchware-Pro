@@ -27,49 +27,49 @@ import mod.agus.jcoderz.dx.rop.cst.CstType;
 import mod.agus.jcoderz.dx.util.FixedSizeList;
 
 /**
- * List of bootstrap method arguments, which are part of the contents of
- * {@code BootstrapMethods} attributes.
+ * List of bootstrap method arguments, which are part of the contents of {@code BootstrapMethods}
+ * attributes.
  */
 public class BootstrapMethodArgumentsList extends FixedSizeList {
-    /**
-     * Constructs an instance.
-     *
-     * @param count the number of elements to be in the list
-     */
-    public BootstrapMethodArgumentsList(int count) {
-        super(count);
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param count the number of elements to be in the list
+   */
+  public BootstrapMethodArgumentsList(int count) {
+    super(count);
+  }
 
-    /**
-     * Gets the bootstrap argument from the indicated position.
-     *
-     * @param n position of argument to get
-     * @return {@code Constant} instance
-     */
-    public mod.agus.jcoderz.dx.rop.cst.Constant get(int n) {
-        return (mod.agus.jcoderz.dx.rop.cst.Constant) get0(n);
-    }
+  /**
+   * Gets the bootstrap argument from the indicated position.
+   *
+   * @param n position of argument to get
+   * @return {@code Constant} instance
+   */
+  public mod.agus.jcoderz.dx.rop.cst.Constant get(int n) {
+    return (mod.agus.jcoderz.dx.rop.cst.Constant) get0(n);
+  }
 
-    /**
-     * Sets the bootstrap argument at the indicated position.
-     *
-     * @param n position of argument to set
-     * @param cst {@code Constant} instance
-     */
-    public void set(int n, Constant cst) {
-        // The set of permitted types is defined by the JVMS 8, section 4.7.23.
-        if (cst instanceof CstString ||
-            cst instanceof CstType ||
-            cst instanceof CstInteger ||
-            cst instanceof CstLong ||
-            cst instanceof CstFloat ||
-            cst instanceof CstDouble ||
-            cst instanceof CstMethodHandle ||
-            cst instanceof CstProtoRef) {
-            set0(n, cst);
-        } else {
-            Class<?> klass = cst.getClass();
-            throw new IllegalArgumentException("bad type for bootstrap argument: " + klass);
-        }
+  /**
+   * Sets the bootstrap argument at the indicated position.
+   *
+   * @param n position of argument to set
+   * @param cst {@code Constant} instance
+   */
+  public void set(int n, Constant cst) {
+    // The set of permitted types is defined by the JVMS 8, section 4.7.23.
+    if (cst instanceof CstString
+        || cst instanceof CstType
+        || cst instanceof CstInteger
+        || cst instanceof CstLong
+        || cst instanceof CstFloat
+        || cst instanceof CstDouble
+        || cst instanceof CstMethodHandle
+        || cst instanceof CstProtoRef) {
+      set0(n, cst);
+    } else {
+      Class<?> klass = cst.getClass();
+      throw new IllegalArgumentException("bad type for bootstrap argument: " + klass);
     }
+  }
 }

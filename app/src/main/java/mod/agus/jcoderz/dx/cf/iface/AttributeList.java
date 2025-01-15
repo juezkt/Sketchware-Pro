@@ -16,60 +16,55 @@
 
 package mod.agus.jcoderz.dx.cf.iface;
 
-/**
- * Interface for lists of attributes.
- */
+/** Interface for lists of attributes. */
 public interface AttributeList {
-    /**
-     * Get whether this instance is mutable. Note that the
-     * {@code AttributeList} interface itself doesn't provide any means
-     * of mutation, but that doesn't mean that there isn't a non-interface
-     * way of mutating an instance.
-     *
-     * @return {@code true} iff this instance is somehow mutable
-     */
-    public boolean isMutable();
+  /**
+   * Get whether this instance is mutable. Note that the {@code AttributeList} interface itself
+   * doesn't provide any means of mutation, but that doesn't mean that there isn't a non-interface
+   * way of mutating an instance.
+   *
+   * @return {@code true} iff this instance is somehow mutable
+   */
+  public boolean isMutable();
 
-    /**
-     * Get the number of attributes in the list.
-     *
-     * @return the size
-     */
-    public int size();
+  /**
+   * Get the number of attributes in the list.
+   *
+   * @return the size
+   */
+  public int size();
 
-    /**
-     * Get the {@code n}th attribute.
-     *
-     * @param n {@code n >= 0, n < size();} which attribute
-     * @return {@code non-null;} the attribute in question
-     */
-    public Attribute get(int n);
+  /**
+   * Get the {@code n}th attribute.
+   *
+   * @param n {@code n >= 0, n < size();} which attribute
+   * @return {@code non-null;} the attribute in question
+   */
+  public Attribute get(int n);
 
-    /**
-     * Get the total length of this list in bytes, when part of a
-     * class file. The returned value includes the two bytes for the
-     * {@code attributes_count} length indicator.
-     *
-     * @return {@code >= 2;} the total length, in bytes
-     */
-    public int byteLength();
+  /**
+   * Get the total length of this list in bytes, when part of a class file. The returned value
+   * includes the two bytes for the {@code attributes_count} length indicator.
+   *
+   * @return {@code >= 2;} the total length, in bytes
+   */
+  public int byteLength();
 
-    /**
-     * Get the first attribute in the list with the given name, if any.
-     *
-     * @param name {@code non-null;} attribute name
-     * @return {@code null-ok;} first attribute in the list with the given name,
-     * or {@code null} if there is none
-     */
-    public Attribute findFirst(String name);
+  /**
+   * Get the first attribute in the list with the given name, if any.
+   *
+   * @param name {@code non-null;} attribute name
+   * @return {@code null-ok;} first attribute in the list with the given name, or {@code null} if
+   *     there is none
+   */
+  public Attribute findFirst(String name);
 
-    /**
-     * Get the next attribute in the list after the given one, with the same
-     * name, if any.
-     *
-     * @param attrib {@code non-null;} attribute to start looking after
-     * @return {@code null-ok;} next attribute after {@code attrib} with the
-     * same name as {@code attrib}
-     */
-    public Attribute findNext(Attribute attrib);
+  /**
+   * Get the next attribute in the list after the given one, with the same name, if any.
+   *
+   * @param attrib {@code non-null;} attribute to start looking after
+   * @return {@code null-ok;} next attribute after {@code attrib} with the same name as {@code
+   *     attrib}
+   */
+  public Attribute findNext(Attribute attrib);
 }

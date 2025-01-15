@@ -16,47 +16,41 @@
 
 package mod.agus.jcoderz.dx.io.instructions;
 
-/**
- * Base implementation of {@link CodeCursor}.
- */
+/** Base implementation of {@link CodeCursor}. */
 public abstract class BaseCodeCursor implements CodeCursor {
-    /** base address map */
-    private final AddressMap baseAddressMap;
+  /** base address map */
+  private final AddressMap baseAddressMap;
 
-    /** next index within {@link #baseAddressMap} to read from or write to */
-    private int cursor;
+  /** next index within {@link #baseAddressMap} to read from or write to */
+  private int cursor;
 
-    /**
-     * Constructs an instance.
-     */
-    public BaseCodeCursor() {
-        this.baseAddressMap = new AddressMap();
-        this.cursor = 0;
-    }
+  /** Constructs an instance. */
+  public BaseCodeCursor() {
+    this.baseAddressMap = new AddressMap();
+    this.cursor = 0;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final int cursor() {
-        return cursor;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final int cursor() {
+    return cursor;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final int baseAddressForCursor() {
-        int mapped = baseAddressMap.get(cursor);
-        return (mapped >= 0) ? mapped : cursor;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final int baseAddressForCursor() {
+    int mapped = baseAddressMap.get(cursor);
+    return (mapped >= 0) ? mapped : cursor;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final void setBaseAddress(int targetAddress, int baseAddress) {
-        baseAddressMap.put(targetAddress, baseAddress);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final void setBaseAddress(int targetAddress, int baseAddress) {
+    baseAddressMap.put(targetAddress, baseAddress);
+  }
 
-    /**
-     * Advance the cursor by the indicated amount.
-     */
-    protected final void advance(int amount) {
-        cursor += amount;
-    }
+  /** Advance the cursor by the indicated amount. */
+  protected final void advance(int amount) {
+    cursor += amount;
+  }
 }

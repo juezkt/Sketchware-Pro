@@ -20,47 +20,47 @@ import mod.agus.jcoderz.dx.cf.code.LocalVariableList;
 import mod.agus.jcoderz.dx.util.MutabilityException;
 
 /**
- * Base attribute class for standard {@code LocalVariableTable}
- * and {@code LocalVariableTypeTable} attributes.
+ * Base attribute class for standard {@code LocalVariableTable} and {@code LocalVariableTypeTable}
+ * attributes.
  */
 public abstract class BaseLocalVariables extends BaseAttribute {
-    /** {@code non-null;} list of local variable entries */
-    private final mod.agus.jcoderz.dx.cf.code.LocalVariableList localVariables;
+  /** {@code non-null;} list of local variable entries */
+  private final mod.agus.jcoderz.dx.cf.code.LocalVariableList localVariables;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param name {@code non-null;} attribute name
-     * @param localVariables {@code non-null;} list of local variable entries
-     */
-    public BaseLocalVariables(String name,
-            mod.agus.jcoderz.dx.cf.code.LocalVariableList localVariables) {
-        super(name);
+  /**
+   * Constructs an instance.
+   *
+   * @param name {@code non-null;} attribute name
+   * @param localVariables {@code non-null;} list of local variable entries
+   */
+  public BaseLocalVariables(
+      String name, mod.agus.jcoderz.dx.cf.code.LocalVariableList localVariables) {
+    super(name);
 
-        try {
-            if (localVariables.isMutable()) {
-                throw new MutabilityException("localVariables.isMutable()");
-            }
-        } catch (NullPointerException ex) {
-            // Translate the exception.
-            throw new NullPointerException("localVariables == null");
-        }
-
-        this.localVariables = localVariables;
+    try {
+      if (localVariables.isMutable()) {
+        throw new MutabilityException("localVariables.isMutable()");
+      }
+    } catch (NullPointerException ex) {
+      // Translate the exception.
+      throw new NullPointerException("localVariables == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final int byteLength() {
-        return 8 + localVariables.size() * 10;
-    }
+    this.localVariables = localVariables;
+  }
 
-    /**
-     * Gets the list of "local variable" entries associated with this instance.
-     *
-     * @return {@code non-null;} the list
-     */
-    public final LocalVariableList getLocalVariables() {
-        return localVariables;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final int byteLength() {
+    return 8 + localVariables.size() * 10;
+  }
+
+  /**
+   * Gets the list of "local variable" entries associated with this instance.
+   *
+   * @return {@code non-null;} the list
+   */
+  public final LocalVariableList getLocalVariables() {
+    return localVariables;
+  }
 }

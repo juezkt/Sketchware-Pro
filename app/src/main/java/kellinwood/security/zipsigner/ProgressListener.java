@@ -17,8 +17,6 @@ package kellinwood.security.zipsigner;
 
 public interface ProgressListener {
 
-    /** Called to notify the listener that progress has been made during
-        the zip signing operation.
-     */
-    void onProgress(ProgressEvent event);
+  /** Called to notify the listener that progress has been made during the zip signing operation. */
+  void onProgress(ProgressEvent event);
 }

@@ -19,55 +19,57 @@ package mod.agus.jcoderz.dx.cf.attrib;
 import mod.agus.jcoderz.dx.rop.annotation.Annotations;
 import mod.agus.jcoderz.dx.util.MutabilityException;
 
-/**
- * Base class for annotations attributes.
- */
+/** Base class for annotations attributes. */
 public abstract class BaseAnnotations extends BaseAttribute {
-    /** {@code non-null;} list of annotations */
-    private final mod.agus.jcoderz.dx.rop.annotation.Annotations annotations;
+  /** {@code non-null;} list of annotations */
+  private final mod.agus.jcoderz.dx.rop.annotation.Annotations annotations;
 
-    /** {@code >= 0;} attribute data length in the original classfile (not
-     * including the attribute header) */
-    private final int byteLength;
+  /**
+   * {@code >= 0;} attribute data length in the original classfile (not including the attribute
+   * header)
+   */
+  private final int byteLength;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param attributeName {@code non-null;} the name of the attribute
-     * @param annotations {@code non-null;} the list of annotations
-     * @param byteLength {@code >= 0;} attribute data length in the original
-     * classfile (not including the attribute header)
-     */
-    public BaseAnnotations(String attributeName, mod.agus.jcoderz.dx.rop.annotation.Annotations annotations,
-            int byteLength) {
-        super(attributeName);
+  /**
+   * Constructs an instance.
+   *
+   * @param attributeName {@code non-null;} the name of the attribute
+   * @param annotations {@code non-null;} the list of annotations
+   * @param byteLength {@code >= 0;} attribute data length in the original classfile (not including
+   *     the attribute header)
+   */
+  public BaseAnnotations(
+      String attributeName,
+      mod.agus.jcoderz.dx.rop.annotation.Annotations annotations,
+      int byteLength) {
+    super(attributeName);
 
-        try {
-            if (annotations.isMutable()) {
-                throw new MutabilityException("annotations.isMutable()");
-            }
-        } catch (NullPointerException ex) {
-            // Translate the exception.
-            throw new NullPointerException("annotations == null");
-        }
-
-        this.annotations = annotations;
-        this.byteLength = byteLength;
+    try {
+      if (annotations.isMutable()) {
+        throw new MutabilityException("annotations.isMutable()");
+      }
+    } catch (NullPointerException ex) {
+      // Translate the exception.
+      throw new NullPointerException("annotations == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public final int byteLength() {
-        // Add six for the standard attribute header.
-        return byteLength + 6;
-    }
+    this.annotations = annotations;
+    this.byteLength = byteLength;
+  }
 
-    /**
-     * Gets the list of annotations associated with this instance.
-     *
-     * @return {@code non-null;} the list
-     */
-    public final Annotations getAnnotations() {
-        return annotations;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final int byteLength() {
+    // Add six for the standard attribute header.
+    return byteLength + 6;
+  }
+
+  /**
+   * Gets the list of annotations associated with this instance.
+   *
+   * @return {@code non-null;} the list
+   */
+  public final Annotations getAnnotations() {
+    return annotations;
+  }
 }

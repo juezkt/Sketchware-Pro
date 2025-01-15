@@ -21,35 +21,34 @@ import mod.agus.jcoderz.dx.rop.cst.CstNat;
 import mod.agus.jcoderz.dx.rop.cst.CstType;
 import mod.agus.jcoderz.dx.rop.cst.TypedConstant;
 
-/**
- * Standard implementation of {@link Field}, which directly stores
- * all the associated data.
- */
+/** Standard implementation of {@link Field}, which directly stores all the associated data. */
 public final class StdField extends StdMember implements Field {
-    /**
-     * Constructs an instance.
-     *
-     * @param definingClass {@code non-null;} the defining class
-     * @param accessFlags access flags
-     * @param nat {@code non-null;} member name and type (descriptor)
-     * @param attributes {@code non-null;} list of associated attributes
-     */
-    public StdField(CstType definingClass, int accessFlags, CstNat nat,
-                    mod.agus.jcoderz.dx.cf.iface.AttributeList attributes) {
-        super(definingClass, accessFlags, nat, attributes);
+  /**
+   * Constructs an instance.
+   *
+   * @param definingClass {@code non-null;} the defining class
+   * @param accessFlags access flags
+   * @param nat {@code non-null;} member name and type (descriptor)
+   * @param attributes {@code non-null;} list of associated attributes
+   */
+  public StdField(
+      CstType definingClass,
+      int accessFlags,
+      CstNat nat,
+      mod.agus.jcoderz.dx.cf.iface.AttributeList attributes) {
+    super(definingClass, accessFlags, nat, attributes);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public TypedConstant getConstantValue() {
+    AttributeList attribs = getAttributes();
+    AttConstantValue cval = (AttConstantValue) attribs.findFirst(AttConstantValue.ATTRIBUTE_NAME);
+
+    if (cval == null) {
+      return null;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public TypedConstant getConstantValue() {
-        AttributeList attribs = getAttributes();
-        AttConstantValue cval = (AttConstantValue)
-            attribs.findFirst(AttConstantValue.ATTRIBUTE_NAME);
-
-        if (cval == null) {
-            return null;
-        }
-
-        return cval.getConstantValue();
-    }
+    return cval.getConstantValue();
+  }
 }

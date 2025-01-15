@@ -22,49 +22,47 @@ import mod.agus.jcoderz.dx.rop.cst.CstType;
 import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 import mod.agus.jcoderz.dx.util.Hex;
 
-/**
- * Representation of a type reference inside a Dalvik file.
- */
+/** Representation of a type reference inside a Dalvik file. */
 public final class TypeIdItem extends IdItem {
-    /**
-     * Constructs an instance.
-     *
-     * @param type {@code non-null;} the constant for the type
-     */
-    public TypeIdItem(mod.agus.jcoderz.dx.rop.cst.CstType type) {
-        super(type);
+  /**
+   * Constructs an instance.
+   *
+   * @param type {@code non-null;} the constant for the type
+   */
+  public TypeIdItem(mod.agus.jcoderz.dx.rop.cst.CstType type) {
+    super(type);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ItemType itemType() {
+    return ItemType.TYPE_TYPE_ID_ITEM;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int writeSize() {
+    return SizeOf.TYPE_ID_ITEM;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void addContents(DexFile file) {
+    file.getStringIds().intern(getDefiningClass().getDescriptor());
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void writeTo(DexFile file, AnnotatedOutput out) {
+    CstType type = getDefiningClass();
+    CstString descriptor = type.getDescriptor();
+    int idx = file.getStringIds().indexOf(descriptor);
+
+    if (out.annotates()) {
+      out.annotate(0, indexString() + ' ' + descriptor.toHuman());
+      out.annotate(4, "  descriptor_idx: " + Hex.u4(idx));
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public ItemType itemType() {
-        return ItemType.TYPE_TYPE_ID_ITEM;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int writeSize() {
-        return SizeOf.TYPE_ID_ITEM;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void addContents(DexFile file) {
-        file.getStringIds().intern(getDefiningClass().getDescriptor());
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(DexFile file, AnnotatedOutput out) {
-        CstType type = getDefiningClass();
-        CstString descriptor = type.getDescriptor();
-        int idx = file.getStringIds().indexOf(descriptor);
-
-        if (out.annotates()) {
-            out.annotate(0, indexString() + ' ' + descriptor.toHuman());
-            out.annotate(4, "  descriptor_idx: " + Hex.u4(idx));
-        }
-
-        out.writeInt(idx);
-    }
+    out.writeInt(idx);
+  }
 }

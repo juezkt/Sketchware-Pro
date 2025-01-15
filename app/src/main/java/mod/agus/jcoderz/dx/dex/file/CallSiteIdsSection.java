@@ -17,115 +17,115 @@ package mod.agus.jcoderz.dx.dex.file;
 
 import java.util.Collection;
 import java.util.TreeMap;
-
 import mod.agus.jcoderz.dx.rop.cst.Constant;
 import mod.agus.jcoderz.dx.rop.cst.CstCallSite;
 import mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef;
 
-/**
- * A section in the DEX file for call site identifiers.
- */
+/** A section in the DEX file for call site identifiers. */
 public final class CallSiteIdsSection extends UniformItemSection {
 
-    /** A map from call site references to their DEX file identifier. */
-    private final TreeMap<mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef, CallSiteIdItem> callSiteIds = new TreeMap<>();
+  /** A map from call site references to their DEX file identifier. */
+  private final TreeMap<mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef, CallSiteIdItem> callSiteIds =
+      new TreeMap<>();
 
-    /** A map from call site instances to their DEX file item. */
-    private final TreeMap<mod.agus.jcoderz.dx.rop.cst.CstCallSite, CallSiteItem> callSites = new TreeMap<>();
+  /** A map from call site instances to their DEX file item. */
+  private final TreeMap<mod.agus.jcoderz.dx.rop.cst.CstCallSite, CallSiteItem> callSites =
+      new TreeMap<>();
 
-    /**
-     * Constructs an instance.
-     *
-     * @param dexFile {@code non-null;} file that this instance is part of
-     */
-    public CallSiteIdsSection(DexFile dexFile) {
-        super("call_site_ids", dexFile, 4);
+  /**
+   * Constructs an instance.
+   *
+   * @param dexFile {@code non-null;} file that this instance is part of
+   */
+  public CallSiteIdsSection(DexFile dexFile) {
+    super("call_site_ids", dexFile, 4);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public IndexedItem get(Constant cst) {
+    if (cst == null) {
+      throw new NullPointerException("cst == null");
+    }
+    throwIfNotPrepared();
+
+    IndexedItem result = callSiteIds.get((mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef) cst);
+    if (result == null) {
+      throw new IllegalArgumentException("not found");
+    }
+    return result;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected void orderItems() {
+    int index = 0;
+    for (CallSiteIdItem callSiteId : callSiteIds.values()) {
+      callSiteId.setIndex(index++);
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public Collection<? extends Item> items() {
+    return callSiteIds.values();
+  }
+
+  /**
+   * Interns a call site into this instance.
+   *
+   * <p>This method is synchronized as it is called during class file translation which runs
+   * concurrently on a per class basis.
+   *
+   * @param cstRef
+   */
+  public synchronized void intern(CstCallSiteRef cstRef) {
+    if (cstRef == null) {
+      throw new NullPointerException("cstRef");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public IndexedItem get(Constant cst) {
-        if (cst == null) {
-            throw new NullPointerException("cst == null");
-        }
-        throwIfNotPrepared();
+    throwIfPrepared();
 
-        IndexedItem result = callSiteIds.get((mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef) cst);
-        if (result == null) {
-            throw new IllegalArgumentException("not found");
-        }
-        return result;
+    CallSiteIdItem result = callSiteIds.get(cstRef);
+    if (result == null) {
+      result = new CallSiteIdItem(cstRef);
+      callSiteIds.put(cstRef, result);
     }
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void orderItems() {
-        int index = 0;
-        for (CallSiteIdItem callSiteId : callSiteIds.values()) {
-            callSiteId.setIndex(index++);
-        }
+  /**
+   * Adds an association between call site constant and its DEX file representation.
+   *
+   * <p>This method is not synchronized as it is called during DEX file writing which happens
+   * concurrently on a per DEX file basis and this information per DEX file.
+   *
+   * @param callSite {@code non-null;} a constant call site
+   * @param callSiteItem {@code non-null;} a call site item as represented in a DEX file
+   */
+  void addCallSiteItem(
+      mod.agus.jcoderz.dx.rop.cst.CstCallSite callSite, CallSiteItem callSiteItem) {
+    if (callSite == null) {
+      throw new NullPointerException("callSite == null");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public Collection<? extends Item> items() {
-        return callSiteIds.values();
+    if (callSiteItem == null) {
+      throw new NullPointerException("callSiteItem == null");
     }
+    callSites.put(callSite, callSiteItem);
+  }
 
-    /**
-     * Interns a call site into this instance.
-     *
-     * This method is synchronized as it is called during class file translation which runs
-     * concurrently on a per class basis.
-     *
-     * @param cstRef
-     */
-    public synchronized void intern(CstCallSiteRef cstRef) {
-        if (cstRef == null) {
-            throw new NullPointerException("cstRef");
-        }
-
-        throwIfPrepared();
-
-        CallSiteIdItem result = callSiteIds.get(cstRef);
-        if (result == null) {
-            result = new CallSiteIdItem(cstRef);
-            callSiteIds.put(cstRef, result);
-        }
+  /**
+   * Gets the DEX file representation of a call site associated with a call site constant.
+   *
+   * <p>This method is not synchronized as it is called during DEX file writing which happens
+   * concurrently on a per DEX file basis and this information per DEX file.
+   *
+   * @param callSite {@code non-null;} a constant call site
+   * @return {@code non-null;} a call site item as represented in a DEX file
+   */
+  CallSiteItem getCallSiteItem(CstCallSite callSite) {
+    if (callSite == null) {
+      throw new NullPointerException("callSite == null");
     }
-
-    /**
-     * Adds an association between call site constant and its DEX file representation.
-     *
-     * This method is not synchronized as it is called during DEX file writing which happens
-     * concurrently on a per DEX file basis and this information per DEX file.
-     *
-     * @param callSite {@code non-null;} a constant call site
-     * @param callSiteItem {@code non-null;} a call site item as represented in a DEX file
-     */
-    void addCallSiteItem(mod.agus.jcoderz.dx.rop.cst.CstCallSite callSite, CallSiteItem callSiteItem) {
-        if (callSite == null) {
-            throw new NullPointerException("callSite == null");
-        }
-        if (callSiteItem == null) {
-            throw new NullPointerException("callSiteItem == null");
-        }
-        callSites.put(callSite, callSiteItem);
-    }
-
-    /**
-     * Gets the DEX file representation of a call site associated with a call site constant.
-     *
-     * This method is not synchronized as it is called during DEX file writing which happens
-     * concurrently on a per DEX file basis and this information per DEX file.
-     *
-     * @param callSite {@code non-null;} a constant call site
-     * @return {@code non-null;} a call site item as represented in a DEX file
-     */
-    CallSiteItem getCallSiteItem(CstCallSite callSite) {
-        if (callSite == null) {
-            throw new NullPointerException("callSite == null");
-        }
-        return callSites.get(callSite);
-    }
+    return callSites.get(callSite);
+  }
 }

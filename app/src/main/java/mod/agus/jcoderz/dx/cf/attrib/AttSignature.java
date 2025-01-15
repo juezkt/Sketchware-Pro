@@ -18,43 +18,41 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.rop.cst.CstString;
 
-/**
- * Attribute class for standards-track {@code Signature} attributes.
- */
+/** Attribute class for standards-track {@code Signature} attributes. */
 public final class AttSignature extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "Signature";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "Signature";
 
-    /** {@code non-null;} the signature string */
-    private final mod.agus.jcoderz.dx.rop.cst.CstString signature;
+  /** {@code non-null;} the signature string */
+  private final mod.agus.jcoderz.dx.rop.cst.CstString signature;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param signature {@code non-null;} the signature string
-     */
-    public AttSignature(mod.agus.jcoderz.dx.rop.cst.CstString signature) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param signature {@code non-null;} the signature string
+   */
+  public AttSignature(mod.agus.jcoderz.dx.rop.cst.CstString signature) {
+    super(ATTRIBUTE_NAME);
 
-        if (signature == null) {
-            throw new NullPointerException("signature == null");
-        }
-
-        this.signature = signature;
+    if (signature == null) {
+      throw new NullPointerException("signature == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return 8;
-    }
+    this.signature = signature;
+  }
 
-    /**
-     * Gets the signature string.
-     *
-     * @return {@code non-null;} the signature string
-     */
-    public CstString getSignature() {
-        return signature;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return 8;
+  }
+
+  /**
+   * Gets the signature string.
+   *
+   * @return {@code non-null;} the signature string
+   */
+  public CstString getSignature() {
+    return signature;
+  }
 }

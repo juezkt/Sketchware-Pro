@@ -16,10 +16,19 @@
 
 package mod.agus.jcoderz.dx.command.dump;
 
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.EnumSet;
 import mod.agus.jcoderz.dx.cf.code.ConcreteMethod;
 import mod.agus.jcoderz.dx.cf.code.Ropper;
 import mod.agus.jcoderz.dx.cf.iface.Member;
 import mod.agus.jcoderz.dx.cf.iface.Method;
+import mod.agus.jcoderz.dx.rop.code.AccessFlags;
+import mod.agus.jcoderz.dx.rop.code.DexTranslationAdvice;
+import mod.agus.jcoderz.dx.rop.code.RopMethod;
+import mod.agus.jcoderz.dx.rop.code.TranslationAdvice;
 import mod.agus.jcoderz.dx.ssa.Optimizer;
 import mod.agus.jcoderz.dx.ssa.SsaBasicBlock;
 import mod.agus.jcoderz.dx.ssa.SsaInsn;
@@ -27,153 +36,135 @@ import mod.agus.jcoderz.dx.ssa.SsaMethod;
 import mod.agus.jcoderz.dx.util.ByteArray;
 import mod.agus.jcoderz.dx.util.Hex;
 import mod.agus.jcoderz.dx.util.IntList;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.EnumSet;
 
-import mod.agus.jcoderz.dx.rop.code.AccessFlags;
-import mod.agus.jcoderz.dx.rop.code.DexTranslationAdvice;
-import mod.agus.jcoderz.dx.rop.code.RopMethod;
-import mod.agus.jcoderz.dx.rop.code.TranslationAdvice;
-
-/**
- * Dumper for the SSA-translated blocks of a method.
- */
+/** Dumper for the SSA-translated blocks of a method. */
 public class SsaDumper extends BlockDumper {
-    /**
-     * Does the dump.
-     *
-     * @param bytes {@code non-null;} bytes of the original class file
-     * @param out {@code non-null;} where to dump to
-     * @param filePath the file path for the class, excluding any base
-     * directory specification
-     * @param args commandline parsedArgs
-     */
-    public static void dump(byte[] bytes, PrintStream out,
-            String filePath, Args args) {
-        SsaDumper sd = new SsaDumper(bytes, out, filePath, args);
-        sd.dump();
+  /**
+   * Does the dump.
+   *
+   * @param bytes {@code non-null;} bytes of the original class file
+   * @param out {@code non-null;} where to dump to
+   * @param filePath the file path for the class, excluding any base directory specification
+   * @param args commandline parsedArgs
+   */
+  public static void dump(byte[] bytes, PrintStream out, String filePath, Args args) {
+    SsaDumper sd = new SsaDumper(bytes, out, filePath, args);
+    sd.dump();
+  }
+
+  /**
+   * Constructs an instance.
+   *
+   * @param bytes {@code non-null;} bytes of the original class file
+   * @param out {@code non-null;} where to dump to
+   * @param filePath the file path for the class, excluding any base directory specification
+   * @param args commandline parsedArgs
+   */
+  private SsaDumper(byte[] bytes, PrintStream out, String filePath, Args args) {
+    super(bytes, out, filePath, true, args);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void endParsingMember(
+      ByteArray bytes, int offset, String name, String descriptor, Member member) {
+    if (!(member instanceof Method)) {
+      return;
     }
 
-    /**
-     * Constructs an instance.
-     *
-     * @param bytes {@code non-null;} bytes of the original class file
-     * @param out {@code non-null;} where to dump to
-     * @param filePath the file path for the class, excluding any base
-     * directory specification
-     * @param args commandline parsedArgs
-     */
-    private SsaDumper(byte[] bytes, PrintStream out, String filePath,
-            Args args) {
-        super(bytes, out, filePath, true, args);
+    if (!shouldDumpMethod(name)) {
+      return;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void endParsingMember(ByteArray bytes, int offset, String name,
-            String descriptor, Member member) {
-        if (!(member instanceof Method)) {
-            return;
-        }
+    if ((member.getAccessFlags()
+            & (mod.agus.jcoderz.dx.rop.code.AccessFlags.ACC_ABSTRACT
+                | mod.agus.jcoderz.dx.rop.code.AccessFlags.ACC_NATIVE))
+        != 0) {
+      return;
+    }
 
-        if (!shouldDumpMethod(name)) {
-            return;
-        }
+    ConcreteMethod meth = new ConcreteMethod((Method) member, classFile, true, true);
+    TranslationAdvice advice = DexTranslationAdvice.THE_ONE;
+    RopMethod rmeth = Ropper.convert(meth, advice, classFile.getMethods(), dexOptions);
+    SsaMethod ssaMeth = null;
+    boolean isStatic = AccessFlags.isStatic(meth.getAccessFlags());
+    int paramWidth = computeParamWidth(meth, isStatic);
 
-        if ((member.getAccessFlags() & (mod.agus.jcoderz.dx.rop.code.AccessFlags.ACC_ABSTRACT |
-                mod.agus.jcoderz.dx.rop.code.AccessFlags.ACC_NATIVE)) != 0) {
-            return;
-        }
+    if (args.ssaStep == null) {
+      ssaMeth =
+          Optimizer.debugNoRegisterAllocation(
+              rmeth,
+              paramWidth,
+              isStatic,
+              true,
+              advice,
+              EnumSet.allOf(Optimizer.OptionalStep.class));
+    } else if ("edge-split".equals(args.ssaStep)) {
+      ssaMeth = Optimizer.debugEdgeSplit(rmeth, paramWidth, isStatic, true, advice);
+    } else if ("phi-placement".equals(args.ssaStep)) {
+      ssaMeth = Optimizer.debugPhiPlacement(rmeth, paramWidth, isStatic, true, advice);
+    } else if ("renaming".equals(args.ssaStep)) {
+      ssaMeth = Optimizer.debugRenaming(rmeth, paramWidth, isStatic, true, advice);
+    } else if ("dead-code".equals(args.ssaStep)) {
+      ssaMeth = Optimizer.debugDeadCodeRemover(rmeth, paramWidth, isStatic, true, advice);
+    }
 
-        ConcreteMethod meth =
-            new ConcreteMethod((Method) member, classFile, true, true);
-        TranslationAdvice advice = DexTranslationAdvice.THE_ONE;
-        RopMethod rmeth = Ropper.convert(meth, advice, classFile.getMethods(), dexOptions);
-        SsaMethod ssaMeth = null;
-        boolean isStatic = AccessFlags.isStatic(meth.getAccessFlags());
-        int paramWidth = computeParamWidth(meth, isStatic);
+    StringBuilder sb = new StringBuilder(2000);
 
-        if (args.ssaStep == null) {
-            ssaMeth = Optimizer.debugNoRegisterAllocation(rmeth,
-                    paramWidth, isStatic, true, advice,
-                    EnumSet.allOf(Optimizer.OptionalStep.class));
-        } else if ("edge-split".equals(args.ssaStep)) {
-            ssaMeth = Optimizer.debugEdgeSplit(rmeth, paramWidth,
-                    isStatic, true, advice);
-        } else if ("phi-placement".equals(args.ssaStep)) {
-            ssaMeth = Optimizer.debugPhiPlacement(
-                    rmeth, paramWidth, isStatic, true, advice);
-        } else if ("renaming".equals(args.ssaStep)) {
-            ssaMeth = Optimizer.debugRenaming(
-                    rmeth, paramWidth, isStatic, true, advice);
-        } else if ("dead-code".equals(args.ssaStep)) {
-            ssaMeth = Optimizer.debugDeadCodeRemover(
-                    rmeth, paramWidth, isStatic,true, advice);
-        }
+    sb.append("first ");
+    sb.append(Hex.u2(ssaMeth.blockIndexToRopLabel(ssaMeth.getEntryBlockIndex())));
+    sb.append('\n');
 
-        StringBuilder sb = new StringBuilder(2000);
+    ArrayList<SsaBasicBlock> blocks = ssaMeth.getBlocks();
+    ArrayList<SsaBasicBlock> sortedBlocks = (ArrayList<SsaBasicBlock>) blocks.clone();
+    Collections.sort(sortedBlocks, SsaBasicBlock.LABEL_COMPARATOR);
 
-        sb.append("first ");
-        sb.append(Hex.u2(
-                ssaMeth.blockIndexToRopLabel(ssaMeth.getEntryBlockIndex())));
+    for (SsaBasicBlock block : sortedBlocks) {
+      sb.append("block ").append(Hex.u2(block.getRopLabel())).append('\n');
+
+      BitSet preds = block.getPredecessors();
+
+      for (int i = preds.nextSetBit(0); i >= 0; i = preds.nextSetBit(i + 1)) {
+        sb.append("  pred ");
+        sb.append(Hex.u2(ssaMeth.blockIndexToRopLabel(i)));
         sb.append('\n');
+      }
 
-        ArrayList<SsaBasicBlock> blocks = ssaMeth.getBlocks();
-        ArrayList<SsaBasicBlock> sortedBlocks =
-            (ArrayList<SsaBasicBlock>) blocks.clone();
-        Collections.sort(sortedBlocks, SsaBasicBlock.LABEL_COMPARATOR);
+      sb.append("  live in:" + block.getLiveInRegs());
+      sb.append("\n");
 
-        for (SsaBasicBlock block : sortedBlocks) {
-            sb.append("block ")
-                    .append(Hex.u2(block.getRopLabel())).append('\n');
+      for (SsaInsn insn : block.getInsns()) {
+        sb.append("  ");
+        sb.append(insn.toHuman());
+        sb.append('\n');
+      }
 
-            BitSet preds = block.getPredecessors();
+      if (block.getSuccessors().cardinality() == 0) {
+        sb.append("  returns\n");
+      } else {
+        int primary = block.getPrimarySuccessorRopLabel();
 
-            for (int i = preds.nextSetBit(0); i >= 0;
-                 i = preds.nextSetBit(i+1)) {
-                sb.append("  pred ");
-                sb.append(Hex.u2(ssaMeth.blockIndexToRopLabel(i)));
-                sb.append('\n');
-            }
+        IntList succLabelList = block.getRopLabelSuccessorList();
 
-            sb.append("  live in:" + block.getLiveInRegs());
-            sb.append("\n");
+        int szSuccLabels = succLabelList.size();
 
-            for (SsaInsn insn : block.getInsns()) {
-                sb.append("  ");
-                sb.append(insn.toHuman());
-                sb.append('\n');
-            }
+        for (int i = 0; i < szSuccLabels; i++) {
+          sb.append("  next ");
+          sb.append(Hex.u2(succLabelList.get(i)));
 
-            if (block.getSuccessors().cardinality() == 0) {
-                sb.append("  returns\n");
-            } else {
-                int primary = block.getPrimarySuccessorRopLabel();
-
-                IntList succLabelList = block.getRopLabelSuccessorList();
-
-                int szSuccLabels = succLabelList.size();
-
-                for (int i = 0; i < szSuccLabels; i++) {
-                    sb.append("  next ");
-                    sb.append(Hex.u2(succLabelList.get(i)));
-
-                    if (szSuccLabels != 1 && primary == succLabelList.get(i)) {
-                        sb.append(" *");
-                    }
-                    sb.append('\n');
-                }
-            }
-
-            sb.append("  live out:" + block.getLiveOutRegs());
-            sb.append("\n");
+          if (szSuccLabels != 1 && primary == succLabelList.get(i)) {
+            sb.append(" *");
+          }
+          sb.append('\n');
         }
+      }
 
-        suppressDump = false;
-        parsed(bytes, 0, bytes.size(), sb.toString());
-        suppressDump = true;
+      sb.append("  live out:" + block.getLiveOutRegs());
+      sb.append("\n");
     }
+
+    suppressDump = false;
+    parsed(bytes, 0, bytes.size(), sb.toString());
+    suppressDump = true;
+  }
 }

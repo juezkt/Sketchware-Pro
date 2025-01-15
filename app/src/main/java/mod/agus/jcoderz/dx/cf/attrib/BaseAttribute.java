@@ -19,29 +19,29 @@ package mod.agus.jcoderz.dx.cf.attrib;
 import mod.agus.jcoderz.dx.cf.iface.Attribute;
 
 /**
- * Base implementation of {@link mod.agus.jcoderz.dx.cf.iface.Attribute}, which directly stores
- * the attribute name but leaves the rest up to subclasses.
+ * Base implementation of {@link mod.agus.jcoderz.dx.cf.iface.Attribute}, which directly stores the
+ * attribute name but leaves the rest up to subclasses.
  */
 public abstract class BaseAttribute implements Attribute {
-    /** {@code non-null;} attribute name */
-    private final String name;
+  /** {@code non-null;} attribute name */
+  private final String name;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param name {@code non-null;} attribute name
-     */
-    public BaseAttribute(String name) {
-        if (name == null) {
-            throw new NullPointerException("name == null");
-        }
-
-        this.name = name;
+  /**
+   * Constructs an instance.
+   *
+   * @param name {@code non-null;} attribute name
+   */
+  public BaseAttribute(String name) {
+    if (name == null) {
+      throw new NullPointerException("name == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return name;
-    }
+    this.name = name;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getName() {
+    return name;
+  }
 }

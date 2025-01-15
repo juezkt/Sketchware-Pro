@@ -23,28 +23,28 @@ import mod.agus.jcoderz.dx.util.FixedSizeList;
  * an array of {@link mod.agus.jcoderz.dx.cf.iface.Method} objects and can be made immutable.
  */
 public final class StdMethodList extends FixedSizeList implements MethodList {
-    /**
-     * Constructs an instance. All indices initially contain {@code null}.
-     *
-     * @param size the size of the list
-     */
-    public StdMethodList(int size) {
-        super(size);
-    }
+  /**
+   * Constructs an instance. All indices initially contain {@code null}.
+   *
+   * @param size the size of the list
+   */
+  public StdMethodList(int size) {
+    super(size);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public mod.agus.jcoderz.dx.cf.iface.Method get(int n) {
-        return (mod.agus.jcoderz.dx.cf.iface.Method) get0(n);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public mod.agus.jcoderz.dx.cf.iface.Method get(int n) {
+    return (mod.agus.jcoderz.dx.cf.iface.Method) get0(n);
+  }
 
-    /**
-     * Sets the method at the given index.
-     *
-     * @param n {@code >= 0, < size();} which method
-     * @param method {@code null-ok;} the method object
-     */
-    public void set(int n, Method method) {
-        set0(n, method);
-    }
+  /**
+   * Sets the method at the given index.
+   *
+   * @param n {@code >= 0, < size();} which method
+   * @param method {@code null-ok;} the method object
+   */
+  public void set(int n, Method method) {
+    set0(n, method);
+  }
 }

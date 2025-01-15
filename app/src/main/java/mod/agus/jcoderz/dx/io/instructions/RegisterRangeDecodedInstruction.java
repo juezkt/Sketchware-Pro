@@ -19,45 +19,56 @@ package mod.agus.jcoderz.dx.io.instructions;
 import mod.agus.jcoderz.dx.io.IndexType;
 
 /**
- * A decoded Dalvik instruction which has register range arguments (an
- * "A" start register and a register count).
+ * A decoded Dalvik instruction which has register range arguments (an "A" start register and a
+ * register count).
  */
-public final class RegisterRangeDecodedInstruction extends mod.agus.jcoderz.dx.io.instructions.DecodedInstruction {
-    /** register argument "A" */
-    private final int a;
+public final class RegisterRangeDecodedInstruction
+    extends mod.agus.jcoderz.dx.io.instructions.DecodedInstruction {
+  /** register argument "A" */
+  private final int a;
 
-    /** register count */
-    private final int registerCount;
+  /** register count */
+  private final int registerCount;
 
-    /**
-     * Constructs an instance.
-     */
-    public RegisterRangeDecodedInstruction(InstructionCodec format, int opcode,
-                                           int index, IndexType indexType, int target, long literal,
-                                           int a, int registerCount) {
-        super(format, opcode, index, indexType, target, literal);
+  /** Constructs an instance. */
+  public RegisterRangeDecodedInstruction(
+      InstructionCodec format,
+      int opcode,
+      int index,
+      IndexType indexType,
+      int target,
+      long literal,
+      int a,
+      int registerCount) {
+    super(format, opcode, index, indexType, target, literal);
 
-        this.a = a;
-        this.registerCount = registerCount;
-    }
+    this.a = a;
+    this.registerCount = registerCount;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getRegisterCount() {
-        return registerCount;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int getRegisterCount() {
+    return registerCount;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getA() {
-        return a;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int getA() {
+    return a;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public DecodedInstruction withIndex(int newIndex) {
-        return new RegisterRangeDecodedInstruction(
-                getFormat(), getOpcode(), newIndex, getIndexType(),
-                getTarget(), getLiteral(), a, registerCount);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public DecodedInstruction withIndex(int newIndex) {
+    return new RegisterRangeDecodedInstruction(
+        getFormat(),
+        getOpcode(),
+        newIndex,
+        getIndexType(),
+        getTarget(),
+        getLiteral(),
+        a,
+        registerCount);
+  }
 }

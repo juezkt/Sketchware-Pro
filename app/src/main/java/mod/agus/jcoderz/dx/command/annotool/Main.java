@@ -22,126 +22,115 @@ import java.util.Locale;
 
 public class Main {
 
-    private static class InvalidArgumentException extends Exception {
-        InvalidArgumentException() {
-            super();
-        }
-
-        InvalidArgumentException(String s) {
-            super(s);
-        }
+  private static class InvalidArgumentException extends Exception {
+    InvalidArgumentException() {
+      super();
     }
 
-    enum PrintType {
-        CLASS,
-        INNERCLASS,
-        METHOD,
-        PACKAGE
+    InvalidArgumentException(String s) {
+      super(s);
     }
+  }
 
+  enum PrintType {
+    CLASS,
+    INNERCLASS,
+    METHOD,
+    PACKAGE
+  }
 
-    static class Arguments {
-        /**
-         * from --annotation, dot-separated classname
-         * of annotation to look for
-         */
-        String aclass;
+  static class Arguments {
+    /** from --annotation, dot-separated classname of annotation to look for */
+    String aclass;
 
-        /** from --eTypes */
-        EnumSet<ElementType> eTypes = EnumSet.noneOf(ElementType.class);
+    /** from --eTypes */
+    EnumSet<ElementType> eTypes = EnumSet.noneOf(ElementType.class);
 
-        /** from --print */
-        EnumSet<PrintType> printTypes = EnumSet.noneOf(PrintType.class);
+    /** from --print */
+    EnumSet<PrintType> printTypes = EnumSet.noneOf(PrintType.class);
 
-        /** remaining positional arguments */
-        String[] files;
+    /** remaining positional arguments */
+    String[] files;
 
-        Arguments() {
+    Arguments() {}
+
+    void parse(String[] argArray) throws InvalidArgumentException {
+      for (int i = 0; i < argArray.length; i++) {
+        String arg = argArray[i];
+
+        if (arg.startsWith("--annotation=")) {
+          String argParam = arg.substring(arg.indexOf('=') + 1);
+          if (aclass != null) {
+            throw new InvalidArgumentException("--annotation can only be specified once.");
+          }
+          aclass = argParam.replace('.', '/');
+        } else if (arg.startsWith("--element=")) {
+          String argParam = arg.substring(arg.indexOf('=') + 1);
+
+          try {
+            for (String p : argParam.split(",")) {
+              eTypes.add(ElementType.valueOf(p.toUpperCase(Locale.ROOT)));
+            }
+          } catch (IllegalArgumentException ex) {
+            throw new InvalidArgumentException("invalid --element");
+          }
+        } else if (arg.startsWith("--print=")) {
+          String argParam = arg.substring(arg.indexOf('=') + 1);
+
+          try {
+            for (String p : argParam.split(",")) {
+              printTypes.add(PrintType.valueOf(p.toUpperCase(Locale.ROOT)));
+            }
+          } catch (IllegalArgumentException ex) {
+            throw new InvalidArgumentException("invalid --print");
+          }
+        } else {
+          files = new String[argArray.length - i];
+          System.arraycopy(argArray, i, files, 0, files.length);
+          break;
         }
+      }
 
-        void parse (String[] argArray) throws InvalidArgumentException {
-            for (int i = 0; i < argArray.length; i++) {
-                String arg = argArray[i];
+      if (aclass == null) {
+        throw new InvalidArgumentException("--annotation must be specified");
+      }
 
-                if (arg.startsWith("--annotation=")) {
-                    String argParam = arg.substring(arg.indexOf('=') + 1);
-                    if (aclass != null) {
-                        throw new InvalidArgumentException(
-                                "--annotation can only be specified once.");
-                    }
-                    aclass = argParam.replace('.','/');
-                } else if (arg.startsWith("--element=")) {
-                    String argParam = arg.substring(arg.indexOf('=') + 1);
+      if (printTypes.isEmpty()) {
+        printTypes.add(PrintType.CLASS);
+      }
 
-                    try {
-                        for (String p : argParam.split(",")) {
-                            eTypes.add(ElementType.valueOf(p.toUpperCase(Locale.ROOT)));
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        throw new InvalidArgumentException(
-                                "invalid --element");
-                    }
-                } else if (arg.startsWith("--print=")) {
-                    String argParam = arg.substring(arg.indexOf('=') + 1);
+      if (eTypes.isEmpty()) {
+        eTypes.add(ElementType.TYPE);
+      }
 
-                    try {
-                        for (String p : argParam.split(",")) {
-                            printTypes.add(PrintType.valueOf(p.toUpperCase(Locale.ROOT)));
-                        }
-                    } catch (IllegalArgumentException ex) {
-                        throw new InvalidArgumentException("invalid --print");
-                    }
-                } else {
-                    files = new String[argArray.length - i];
-                    System.arraycopy(argArray, i, files, 0, files.length);
-                    break;
-                }
-            }
+      EnumSet<ElementType> set = eTypes.clone();
 
-            if (aclass == null) {
-                throw new InvalidArgumentException(
-                        "--annotation must be specified");
-            }
+      set.remove(ElementType.TYPE);
+      set.remove(ElementType.PACKAGE);
+      if (!set.isEmpty()) {
+        throw new InvalidArgumentException(
+            "only --element parameters 'type' and 'package' " + "supported");
+      }
+    }
+  }
 
-            if (printTypes.isEmpty()) {
-                printTypes.add(PrintType.CLASS);
-            }
+  /** This class is uninstantiable. */
+  private Main() {
+    // This space intentionally left blank.
+  }
 
-            if (eTypes.isEmpty()) {
-                eTypes.add(ElementType.TYPE);
-            }
+  public static void main(String[] argArray) {
 
-            EnumSet<ElementType> set = eTypes.clone();
+    final Arguments args = new Arguments();
 
-            set.remove(ElementType.TYPE);
-            set.remove(ElementType.PACKAGE);
-            if (!set.isEmpty()) {
-                throw new InvalidArgumentException(
-                        "only --element parameters 'type' and 'package' "
-                                + "supported");
-            }
-        }
+    try {
+      args.parse(argArray);
+    } catch (InvalidArgumentException ex) {
+      System.err.println(ex.getMessage());
+
+      throw new RuntimeException("usage");
     }
 
-    /**
-     * This class is uninstantiable.
-     */
-    private Main() {
-        // This space intentionally left blank.
-    }
-
-    public static void main(String[] argArray) {
-
-        final Arguments args = new Arguments();
-
-        try {
-            args.parse(argArray);
-        } catch (InvalidArgumentException ex) {
-            System.err.println(ex.getMessage());
-
-            throw new RuntimeException("usage");
-        }
-
-        new AnnotationLister(args).process();
-    }
+    new AnnotationLister(args).process();
+  }
 }

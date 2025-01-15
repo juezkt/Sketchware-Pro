@@ -20,104 +20,100 @@ import mod.agus.jcoderz.dx.rop.cst.CstArray;
 import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 import mod.agus.jcoderz.dx.util.ByteArrayAnnotatedOutput;
 
-/**
- * Encoded array of constant values.
- */
+/** Encoded array of constant values. */
 public final class EncodedArrayItem extends mod.agus.jcoderz.dx.dex.file.OffsettedItem {
-    /** the required alignment for instances of this class */
-    private static final int ALIGNMENT = 1;
+  /** the required alignment for instances of this class */
+  private static final int ALIGNMENT = 1;
 
-    /** {@code non-null;} the array to represent */
-    private final mod.agus.jcoderz.dx.rop.cst.CstArray array;
+  /** {@code non-null;} the array to represent */
+  private final mod.agus.jcoderz.dx.rop.cst.CstArray array;
 
-    /**
-     * {@code null-ok;} encoded form, ready for writing to a file; set during
-     * {@link #place0}
+  /** {@code null-ok;} encoded form, ready for writing to a file; set during {@link #place0} */
+  private byte[] encodedForm;
+
+  /**
+   * Constructs an instance.
+   *
+   * @param array {@code non-null;} array to represent
+   */
+  public EncodedArrayItem(CstArray array) {
+    /*
+     * The write size isn't known up-front because (the variable-lengthed)
+     * leb128 type is used to represent some things.
      */
-    private byte[] encodedForm;
+    super(ALIGNMENT, -1);
 
-    /**
-     * Constructs an instance.
-     *
-     * @param array {@code non-null;} array to represent
-     */
-    public EncodedArrayItem(CstArray array) {
-        /*
-         * The write size isn't known up-front because (the variable-lengthed)
-         * leb128 type is used to represent some things.
-         */
-        super(ALIGNMENT, -1);
-
-        if (array == null) {
-            throw new NullPointerException("array == null");
-        }
-
-        this.array = array;
-        this.encodedForm = null;
+    if (array == null) {
+      throw new NullPointerException("array == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public ItemType itemType() {
-        return ItemType.TYPE_ENCODED_ARRAY_ITEM;
+    this.array = array;
+    this.encodedForm = null;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ItemType itemType() {
+    return ItemType.TYPE_ENCODED_ARRAY_ITEM;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode() {
+    return array.hashCode();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected int compareTo0(OffsettedItem other) {
+    EncodedArrayItem otherArray = (EncodedArrayItem) other;
+
+    return array.compareTo(otherArray.array);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toHuman() {
+    return array.toHuman();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void addContents(DexFile file) {
+    mod.agus.jcoderz.dx.dex.file.ValueEncoder.addContents(file, array);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected void place0(Section addedTo, int offset) {
+    // Encode the data and note the size.
+
+    mod.agus.jcoderz.dx.util.ByteArrayAnnotatedOutput out = new ByteArrayAnnotatedOutput();
+    mod.agus.jcoderz.dx.dex.file.ValueEncoder encoder =
+        new mod.agus.jcoderz.dx.dex.file.ValueEncoder(addedTo.getFile(), out);
+
+    encoder.writeArray(array, false);
+    encodedForm = out.toByteArray();
+    setWriteSize(encodedForm.length);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected void writeTo0(DexFile file, AnnotatedOutput out) {
+    boolean annotates = out.annotates();
+
+    if (annotates) {
+      out.annotate(0, offsetString() + " encoded array");
+
+      /*
+       * The output is to be annotated, so redo the work previously
+       * done by place0(), except this time annotations will actually
+       * get emitted.
+       */
+      mod.agus.jcoderz.dx.dex.file.ValueEncoder encoder = new ValueEncoder(file, out);
+      encoder.writeArray(array, true);
+    } else {
+      out.write(encodedForm);
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        return array.hashCode();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected int compareTo0(OffsettedItem other) {
-        EncodedArrayItem otherArray = (EncodedArrayItem) other;
-
-        return array.compareTo(otherArray.array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toHuman() {
-        return array.toHuman();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void addContents(DexFile file) {
-        mod.agus.jcoderz.dx.dex.file.ValueEncoder.addContents(file, array);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void place0(Section addedTo, int offset) {
-        // Encode the data and note the size.
-
-        mod.agus.jcoderz.dx.util.ByteArrayAnnotatedOutput out = new ByteArrayAnnotatedOutput();
-        mod.agus.jcoderz.dx.dex.file.ValueEncoder encoder = new mod.agus.jcoderz.dx.dex.file.ValueEncoder(addedTo.getFile(), out);
-
-        encoder.writeArray(array, false);
-        encodedForm = out.toByteArray();
-        setWriteSize(encodedForm.length);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void writeTo0(DexFile file, AnnotatedOutput out) {
-        boolean annotates = out.annotates();
-
-        if (annotates) {
-            out.annotate(0, offsetString() + " encoded array");
-
-            /*
-             * The output is to be annotated, so redo the work previously
-             * done by place0(), except this time annotations will actually
-             * get emitted.
-             */
-            mod.agus.jcoderz.dx.dex.file.ValueEncoder encoder = new ValueEncoder(file, out);
-            encoder.writeArray(array, true);
-        } else {
-            out.write(encodedForm);
-        }
-    }
+  }
 }

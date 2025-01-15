@@ -1,4 +1,3 @@
 package kellinwood.security.zipsigner.optional;
 
-public class KeyNameConflictException extends Exception {
-}
+public class KeyNameConflictException extends Exception {}

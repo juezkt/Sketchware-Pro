@@ -18,7 +18,6 @@ package mod.agus.jcoderz.dx.dex.code;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-
 import mod.agus.jcoderz.dx.rop.code.BasicBlock;
 import mod.agus.jcoderz.dx.rop.code.BasicBlockList;
 import mod.agus.jcoderz.dx.rop.code.RopMethod;
@@ -28,292 +27,294 @@ import mod.agus.jcoderz.dx.rop.type.TypeList;
 import mod.agus.jcoderz.dx.util.IntList;
 
 /**
- * Constructor of {@link mod.agus.jcoderz.dx.dex.code.CatchTable} instances from {@link mod.agus.jcoderz.dx.rop.code.RopMethod}
- * and associated data.
+ * Constructor of {@link mod.agus.jcoderz.dx.dex.code.CatchTable} instances from {@link
+ * mod.agus.jcoderz.dx.rop.code.RopMethod} and associated data.
  */
 public final class StdCatchBuilder implements CatchBuilder {
-    /** the maximum range of a single catch handler, in code units */
-    private static final int MAX_CATCH_RANGE = 65535;
+  /** the maximum range of a single catch handler, in code units */
+  private static final int MAX_CATCH_RANGE = 65535;
 
-    /** {@code non-null;} method to build the list for */
-    private final mod.agus.jcoderz.dx.rop.code.RopMethod method;
+  /** {@code non-null;} method to build the list for */
+  private final mod.agus.jcoderz.dx.rop.code.RopMethod method;
 
-    /** {@code non-null;} block output order */
-    private final int[] order;
+  /** {@code non-null;} block output order */
+  private final int[] order;
 
-    /** {@code non-null;} address objects for each block */
-    private final mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses;
+  /** {@code non-null;} address objects for each block */
+  private final mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses;
 
-    /**
-     * Constructs an instance. It merely holds onto its parameters for
-     * a subsequent call to {@link #build}.
-     *
-     * @param method {@code non-null;} method to build the list for
-     * @param order {@code non-null;} block output order
-     * @param addresses {@code non-null;} address objects for each block
-     */
-    public StdCatchBuilder(mod.agus.jcoderz.dx.rop.code.RopMethod method, int[] order,
-                           mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
-        if (method == null) {
-            throw new NullPointerException("method == null");
-        }
-
-        if (order == null) {
-            throw new NullPointerException("order == null");
-        }
-
-        if (addresses == null) {
-            throw new NullPointerException("addresses == null");
-        }
-
-        this.method = method;
-        this.order = order;
-        this.addresses = addresses;
+  /**
+   * Constructs an instance. It merely holds onto its parameters for a subsequent call to {@link
+   * #build}.
+   *
+   * @param method {@code non-null;} method to build the list for
+   * @param order {@code non-null;} block output order
+   * @param addresses {@code non-null;} address objects for each block
+   */
+  public StdCatchBuilder(
+      mod.agus.jcoderz.dx.rop.code.RopMethod method,
+      int[] order,
+      mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
+    if (method == null) {
+      throw new NullPointerException("method == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public mod.agus.jcoderz.dx.dex.code.CatchTable build() {
-        return build(method, order, addresses);
+    if (order == null) {
+      throw new NullPointerException("order == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean hasAnyCatches() {
-        mod.agus.jcoderz.dx.rop.code.BasicBlockList blocks = method.getBlocks();
-        int size = blocks.size();
-
-        for (int i = 0; i < size; i++) {
-            mod.agus.jcoderz.dx.rop.code.BasicBlock block = blocks.get(i);
-            mod.agus.jcoderz.dx.rop.type.TypeList catches = block.getLastInsn().getCatches();
-            if (catches.size() != 0) {
-                return true;
-            }
-        }
-
-        return false;
+    if (addresses == null) {
+      throw new NullPointerException("addresses == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public HashSet<mod.agus.jcoderz.dx.rop.type.Type> getCatchTypes() {
-        HashSet<mod.agus.jcoderz.dx.rop.type.Type> result = new HashSet<mod.agus.jcoderz.dx.rop.type.Type>(20);
-        mod.agus.jcoderz.dx.rop.code.BasicBlockList blocks = method.getBlocks();
-        int size = blocks.size();
+    this.method = method;
+    this.order = order;
+    this.addresses = addresses;
+  }
 
-        for (int i = 0; i < size; i++) {
-            mod.agus.jcoderz.dx.rop.code.BasicBlock block = blocks.get(i);
-            mod.agus.jcoderz.dx.rop.type.TypeList catches = block.getLastInsn().getCatches();
-            int catchSize = catches.size();
+  /** {@inheritDoc} */
+  @Override
+  public mod.agus.jcoderz.dx.dex.code.CatchTable build() {
+    return build(method, order, addresses);
+  }
 
-            for (int j = 0; j < catchSize; j++) {
-                result.add(catches.getType(j));
-            }
-        }
+  /** {@inheritDoc} */
+  @Override
+  public boolean hasAnyCatches() {
+    mod.agus.jcoderz.dx.rop.code.BasicBlockList blocks = method.getBlocks();
+    int size = blocks.size();
 
-        return result;
+    for (int i = 0; i < size; i++) {
+      mod.agus.jcoderz.dx.rop.code.BasicBlock block = blocks.get(i);
+      mod.agus.jcoderz.dx.rop.type.TypeList catches = block.getLastInsn().getCatches();
+      if (catches.size() != 0) {
+        return true;
+      }
     }
 
-    /**
-     * Builds and returns the catch table for a given method.
-     *
-     * @param method {@code non-null;} method to build the list for
-     * @param order {@code non-null;} block output order
-     * @param addresses {@code non-null;} address objects for each block
-     * @return {@code non-null;} the constructed table
-     */
-    public static mod.agus.jcoderz.dx.dex.code.CatchTable build(RopMethod method, int[] order,
-                                                                mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
-        int len = order.length;
-        BasicBlockList blocks = method.getBlocks();
-        ArrayList<mod.agus.jcoderz.dx.dex.code.CatchTable.Entry> resultList =
-            new ArrayList<mod.agus.jcoderz.dx.dex.code.CatchTable.Entry>(len);
-        mod.agus.jcoderz.dx.dex.code.CatchHandlerList currentHandlers = mod.agus.jcoderz.dx.dex.code.CatchHandlerList.EMPTY;
-        mod.agus.jcoderz.dx.rop.code.BasicBlock currentStartBlock = null;
-        mod.agus.jcoderz.dx.rop.code.BasicBlock currentEndBlock = null;
+    return false;
+  }
 
-        for (int i = 0; i < len; i++) {
-            mod.agus.jcoderz.dx.rop.code.BasicBlock block = blocks.labelToBlock(order[i]);
+  /** {@inheritDoc} */
+  @Override
+  public HashSet<mod.agus.jcoderz.dx.rop.type.Type> getCatchTypes() {
+    HashSet<mod.agus.jcoderz.dx.rop.type.Type> result =
+        new HashSet<mod.agus.jcoderz.dx.rop.type.Type>(20);
+    mod.agus.jcoderz.dx.rop.code.BasicBlockList blocks = method.getBlocks();
+    int size = blocks.size();
 
-            if (!block.canThrow()) {
-                /*
-                 * There is no need to concern ourselves with the
-                 * placement of blocks that can't throw with respect
-                 * to the blocks that *can* throw.
-                 */
-                continue;
-            }
+    for (int i = 0; i < size; i++) {
+      mod.agus.jcoderz.dx.rop.code.BasicBlock block = blocks.get(i);
+      mod.agus.jcoderz.dx.rop.type.TypeList catches = block.getLastInsn().getCatches();
+      int catchSize = catches.size();
 
-            mod.agus.jcoderz.dx.dex.code.CatchHandlerList handlers = handlersFor(block, addresses);
-
-            if (currentHandlers.size() == 0) {
-                // This is the start of a new catch range.
-                currentStartBlock = block;
-                currentEndBlock = block;
-                currentHandlers = handlers;
-                continue;
-            }
-
-            if (currentHandlers.equals(handlers)
-                    && rangeIsValid(currentStartBlock, block, addresses)) {
-                /*
-                 * The block we are looking at now has the same handlers
-                 * as the block that started the currently open catch
-                 * range, and adding it to the currently open range won't
-                 * cause it to be too long.
-                 */
-                currentEndBlock = block;
-                continue;
-            }
-
-            /*
-             * The block we are looking at now has incompatible handlers,
-             * so we need to finish off the last entry and start a new
-             * one. Note: We only emit an entry if it has associated handlers.
-             */
-            if (currentHandlers.size() != 0) {
-                mod.agus.jcoderz.dx.dex.code.CatchTable.Entry entry =
-                    makeEntry(currentStartBlock, currentEndBlock,
-                            currentHandlers, addresses);
-                resultList.add(entry);
-            }
-
-            currentStartBlock = block;
-            currentEndBlock = block;
-            currentHandlers = handlers;
-        }
-
-        if (currentHandlers.size() != 0) {
-            // Emit an entry for the range that was left hanging.
-            mod.agus.jcoderz.dx.dex.code.CatchTable.Entry entry =
-                makeEntry(currentStartBlock, currentEndBlock,
-                        currentHandlers, addresses);
-            resultList.add(entry);
-        }
-
-        // Construct the final result.
-
-        int resultSz = resultList.size();
-
-        if (resultSz == 0) {
-            return mod.agus.jcoderz.dx.dex.code.CatchTable.EMPTY;
-        }
-
-        mod.agus.jcoderz.dx.dex.code.CatchTable result = new mod.agus.jcoderz.dx.dex.code.CatchTable(resultSz);
-
-        for (int i = 0; i < resultSz; i++) {
-            result.set(i, resultList.get(i));
-        }
-
-        result.setImmutable();
-        return result;
+      for (int j = 0; j < catchSize; j++) {
+        result.add(catches.getType(j));
+      }
     }
 
-    /**
-     * Makes the {@link mod.agus.jcoderz.dx.dex.code.CatchHandlerList} for the given basic block.
-     *
-     * @param block {@code non-null;} block to get entries for
-     * @param addresses {@code non-null;} address objects for each block
-     * @return {@code non-null;} array of entries
-     */
-    private static mod.agus.jcoderz.dx.dex.code.CatchHandlerList handlersFor(mod.agus.jcoderz.dx.rop.code.BasicBlock block,
-                                                                             mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
-        IntList successors = block.getSuccessors();
-        int succSize = successors.size();
-        int primary = block.getPrimarySuccessor();
-        TypeList catches = block.getLastInsn().getCatches();
-        int catchSize = catches.size();
+    return result;
+  }
 
-        if (catchSize == 0) {
-            return mod.agus.jcoderz.dx.dex.code.CatchHandlerList.EMPTY;
-        }
+  /**
+   * Builds and returns the catch table for a given method.
+   *
+   * @param method {@code non-null;} method to build the list for
+   * @param order {@code non-null;} block output order
+   * @param addresses {@code non-null;} address objects for each block
+   * @return {@code non-null;} the constructed table
+   */
+  public static mod.agus.jcoderz.dx.dex.code.CatchTable build(
+      RopMethod method, int[] order, mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
+    int len = order.length;
+    BasicBlockList blocks = method.getBlocks();
+    ArrayList<mod.agus.jcoderz.dx.dex.code.CatchTable.Entry> resultList =
+        new ArrayList<mod.agus.jcoderz.dx.dex.code.CatchTable.Entry>(len);
+    mod.agus.jcoderz.dx.dex.code.CatchHandlerList currentHandlers =
+        mod.agus.jcoderz.dx.dex.code.CatchHandlerList.EMPTY;
+    mod.agus.jcoderz.dx.rop.code.BasicBlock currentStartBlock = null;
+    mod.agus.jcoderz.dx.rop.code.BasicBlock currentEndBlock = null;
 
-        if (((primary == -1) && (succSize != catchSize))
-                || ((primary != -1) &&
-                        ((succSize != (catchSize + 1))
-                                || (primary != successors.get(catchSize))))) {
-            /*
-             * Blocks that throw are supposed to list their primary
-             * successor -- if any -- last in the successors list, but
-             * that constraint appears to be violated here.
-             */
-            throw new RuntimeException(
-                    "shouldn't happen: weird successors list");
-        }
+    for (int i = 0; i < len; i++) {
+      mod.agus.jcoderz.dx.rop.code.BasicBlock block = blocks.labelToBlock(order[i]);
 
+      if (!block.canThrow()) {
         /*
-         * Reduce the effective catchSize if we spot a catch-all that
-         * isn't at the end.
+         * There is no need to concern ourselves with the
+         * placement of blocks that can't throw with respect
+         * to the blocks that *can* throw.
          */
-        for (int i = 0; i < catchSize; i++) {
-            mod.agus.jcoderz.dx.rop.type.Type type = catches.getType(i);
-            if (type.equals(Type.OBJECT)) {
-                catchSize = i + 1;
-                break;
-            }
-        }
+        continue;
+      }
 
-        mod.agus.jcoderz.dx.dex.code.CatchHandlerList result = new mod.agus.jcoderz.dx.dex.code.CatchHandlerList(catchSize);
+      mod.agus.jcoderz.dx.dex.code.CatchHandlerList handlers = handlersFor(block, addresses);
 
-        for (int i = 0; i < catchSize; i++) {
-            mod.agus.jcoderz.dx.rop.cst.CstType oneType = new CstType(catches.getType(i));
-            mod.agus.jcoderz.dx.dex.code.CodeAddress oneHandler = addresses.getStart(successors.get(i));
-            result.set(i, oneType, oneHandler.getAddress());
-        }
+      if (currentHandlers.size() == 0) {
+        // This is the start of a new catch range.
+        currentStartBlock = block;
+        currentEndBlock = block;
+        currentHandlers = handlers;
+        continue;
+      }
 
-        result.setImmutable();
-        return result;
-    }
-
-    /**
-     * Makes a {@link mod.agus.jcoderz.dx.dex.code.CatchTable.Entry} for the given block range and
-     * handlers.
-     *
-     * @param start {@code non-null;} the start block for the range (inclusive)
-     * @param end {@code non-null;} the start block for the range (also inclusive)
-     * @param handlers {@code non-null;} the handlers for the range
-     * @param addresses {@code non-null;} address objects for each block
-     */
-    private static mod.agus.jcoderz.dx.dex.code.CatchTable.Entry makeEntry(mod.agus.jcoderz.dx.rop.code.BasicBlock start,
-                                                                           mod.agus.jcoderz.dx.rop.code.BasicBlock end, CatchHandlerList handlers,
-                                                                           mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
+      if (currentHandlers.equals(handlers) && rangeIsValid(currentStartBlock, block, addresses)) {
         /*
-         * We start at the *last* instruction of the start block, since
-         * that's the instruction that can throw...
+         * The block we are looking at now has the same handlers
+         * as the block that started the currently open catch
+         * range, and adding it to the currently open range won't
+         * cause it to be too long.
          */
-        mod.agus.jcoderz.dx.dex.code.CodeAddress startAddress = addresses.getLast(start);
+        currentEndBlock = block;
+        continue;
+      }
 
-        // ...And we end *after* the last instruction of the end block.
-        CodeAddress endAddress = addresses.getEnd(end);
+      /*
+       * The block we are looking at now has incompatible handlers,
+       * so we need to finish off the last entry and start a new
+       * one. Note: We only emit an entry if it has associated handlers.
+       */
+      if (currentHandlers.size() != 0) {
+        mod.agus.jcoderz.dx.dex.code.CatchTable.Entry entry =
+            makeEntry(currentStartBlock, currentEndBlock, currentHandlers, addresses);
+        resultList.add(entry);
+      }
 
-        return new CatchTable.Entry(startAddress.getAddress(),
-                endAddress.getAddress(), handlers);
+      currentStartBlock = block;
+      currentEndBlock = block;
+      currentHandlers = handlers;
     }
 
-    /**
-     * Gets whether the address range for the given two blocks is valid
-     * for a catch handler. This is true as long as the covered range is
-     * under 65536 code units.
-     *
-     * @param start {@code non-null;} the start block for the range (inclusive)
-     * @param end {@code non-null;} the start block for the range (also inclusive)
-     * @param addresses {@code non-null;} address objects for each block
-     * @return {@code true} if the range is valid as a catch range
+    if (currentHandlers.size() != 0) {
+      // Emit an entry for the range that was left hanging.
+      mod.agus.jcoderz.dx.dex.code.CatchTable.Entry entry =
+          makeEntry(currentStartBlock, currentEndBlock, currentHandlers, addresses);
+      resultList.add(entry);
+    }
+
+    // Construct the final result.
+
+    int resultSz = resultList.size();
+
+    if (resultSz == 0) {
+      return mod.agus.jcoderz.dx.dex.code.CatchTable.EMPTY;
+    }
+
+    mod.agus.jcoderz.dx.dex.code.CatchTable result =
+        new mod.agus.jcoderz.dx.dex.code.CatchTable(resultSz);
+
+    for (int i = 0; i < resultSz; i++) {
+      result.set(i, resultList.get(i));
+    }
+
+    result.setImmutable();
+    return result;
+  }
+
+  /**
+   * Makes the {@link mod.agus.jcoderz.dx.dex.code.CatchHandlerList} for the given basic block.
+   *
+   * @param block {@code non-null;} block to get entries for
+   * @param addresses {@code non-null;} address objects for each block
+   * @return {@code non-null;} array of entries
+   */
+  private static mod.agus.jcoderz.dx.dex.code.CatchHandlerList handlersFor(
+      mod.agus.jcoderz.dx.rop.code.BasicBlock block,
+      mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
+    IntList successors = block.getSuccessors();
+    int succSize = successors.size();
+    int primary = block.getPrimarySuccessor();
+    TypeList catches = block.getLastInsn().getCatches();
+    int catchSize = catches.size();
+
+    if (catchSize == 0) {
+      return mod.agus.jcoderz.dx.dex.code.CatchHandlerList.EMPTY;
+    }
+
+    if (((primary == -1) && (succSize != catchSize))
+        || ((primary != -1)
+            && ((succSize != (catchSize + 1)) || (primary != successors.get(catchSize))))) {
+      /*
+       * Blocks that throw are supposed to list their primary
+       * successor -- if any -- last in the successors list, but
+       * that constraint appears to be violated here.
+       */
+      throw new RuntimeException("shouldn't happen: weird successors list");
+    }
+
+    /*
+     * Reduce the effective catchSize if we spot a catch-all that
+     * isn't at the end.
      */
-    private static boolean rangeIsValid(mod.agus.jcoderz.dx.rop.code.BasicBlock start, BasicBlock end,
-                                        BlockAddresses addresses) {
-        if (start == null) {
-            throw new NullPointerException("start == null");
-        }
-
-        if (end == null) {
-            throw new NullPointerException("end == null");
-        }
-
-        // See above about selection of instructions.
-        int startAddress = addresses.getLast(start).getAddress();
-        int endAddress = addresses.getEnd(end).getAddress();
-
-        return (endAddress - startAddress) <= MAX_CATCH_RANGE;
+    for (int i = 0; i < catchSize; i++) {
+      mod.agus.jcoderz.dx.rop.type.Type type = catches.getType(i);
+      if (type.equals(Type.OBJECT)) {
+        catchSize = i + 1;
+        break;
+      }
     }
+
+    mod.agus.jcoderz.dx.dex.code.CatchHandlerList result =
+        new mod.agus.jcoderz.dx.dex.code.CatchHandlerList(catchSize);
+
+    for (int i = 0; i < catchSize; i++) {
+      mod.agus.jcoderz.dx.rop.cst.CstType oneType = new CstType(catches.getType(i));
+      mod.agus.jcoderz.dx.dex.code.CodeAddress oneHandler = addresses.getStart(successors.get(i));
+      result.set(i, oneType, oneHandler.getAddress());
+    }
+
+    result.setImmutable();
+    return result;
+  }
+
+  /**
+   * Makes a {@link mod.agus.jcoderz.dx.dex.code.CatchTable.Entry} for the given block range and
+   * handlers.
+   *
+   * @param start {@code non-null;} the start block for the range (inclusive)
+   * @param end {@code non-null;} the start block for the range (also inclusive)
+   * @param handlers {@code non-null;} the handlers for the range
+   * @param addresses {@code non-null;} address objects for each block
+   */
+  private static mod.agus.jcoderz.dx.dex.code.CatchTable.Entry makeEntry(
+      mod.agus.jcoderz.dx.rop.code.BasicBlock start,
+      mod.agus.jcoderz.dx.rop.code.BasicBlock end,
+      CatchHandlerList handlers,
+      mod.agus.jcoderz.dx.dex.code.BlockAddresses addresses) {
+    /*
+     * We start at the *last* instruction of the start block, since
+     * that's the instruction that can throw...
+     */
+    mod.agus.jcoderz.dx.dex.code.CodeAddress startAddress = addresses.getLast(start);
+
+    // ...And we end *after* the last instruction of the end block.
+    CodeAddress endAddress = addresses.getEnd(end);
+
+    return new CatchTable.Entry(startAddress.getAddress(), endAddress.getAddress(), handlers);
+  }
+
+  /**
+   * Gets whether the address range for the given two blocks is valid for a catch handler. This is
+   * true as long as the covered range is under 65536 code units.
+   *
+   * @param start {@code non-null;} the start block for the range (inclusive)
+   * @param end {@code non-null;} the start block for the range (also inclusive)
+   * @param addresses {@code non-null;} address objects for each block
+   * @return {@code true} if the range is valid as a catch range
+   */
+  private static boolean rangeIsValid(
+      mod.agus.jcoderz.dx.rop.code.BasicBlock start, BasicBlock end, BlockAddresses addresses) {
+    if (start == null) {
+      throw new NullPointerException("start == null");
+    }
+
+    if (end == null) {
+      throw new NullPointerException("end == null");
+    }
+
+    // See above about selection of instructions.
+    int startAddress = addresses.getLast(start).getAddress();
+    int endAddress = addresses.getEnd(end).getAddress();
+
+    return (endAddress - startAddress) <= MAX_CATCH_RANGE;
+  }
 }

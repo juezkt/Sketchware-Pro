@@ -18,23 +18,19 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.rop.annotation.Annotations;
 
-/**
- * Attribute class for standard {@code RuntimeVisibleAnnotations}
- * attributes.
- */
+/** Attribute class for standard {@code RuntimeVisibleAnnotations} attributes. */
 public final class AttRuntimeVisibleAnnotations extends BaseAnnotations {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "RuntimeVisibleAnnotations";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "RuntimeVisibleAnnotations";
 
-    /**
-     * Constructs an instance.
-     *
-     * @param annotations {@code non-null;} the list of annotations
-     * @param byteLength {@code >= 0;} attribute data length in the original
-     * classfile (not including the attribute header)
-     */
-    public AttRuntimeVisibleAnnotations(Annotations annotations,
-                                        int byteLength) {
-        super(ATTRIBUTE_NAME, annotations, byteLength);
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param annotations {@code non-null;} the list of annotations
+   * @param byteLength {@code >= 0;} attribute data length in the original classfile (not including
+   *     the attribute header)
+   */
+  public AttRuntimeVisibleAnnotations(Annotations annotations, int byteLength) {
+    super(ATTRIBUTE_NAME, annotations, byteLength);
+  }
 }

@@ -18,44 +18,37 @@ package mod.agus.jcoderz.dx.dex.file;
 
 import mod.agus.jcoderz.dx.rop.cst.CstType;
 
-/**
- * Representation of a reference to an item inside a Dalvik file.
- */
+/** Representation of a reference to an item inside a Dalvik file. */
 public abstract class IdItem extends IndexedItem {
-    /**
-     * {@code non-null;} the type constant for the defining class of
-     * the reference
-     */
-    private final mod.agus.jcoderz.dx.rop.cst.CstType type;
+  /** {@code non-null;} the type constant for the defining class of the reference */
+  private final mod.agus.jcoderz.dx.rop.cst.CstType type;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param type {@code non-null;} the type constant for the defining
-     * class of the reference
-     */
-    public IdItem(mod.agus.jcoderz.dx.rop.cst.CstType type) {
-        if (type == null) {
-            throw new NullPointerException("type == null");
-        }
-
-        this.type = type;
+  /**
+   * Constructs an instance.
+   *
+   * @param type {@code non-null;} the type constant for the defining class of the reference
+   */
+  public IdItem(mod.agus.jcoderz.dx.rop.cst.CstType type) {
+    if (type == null) {
+      throw new NullPointerException("type == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void addContents(DexFile file) {
-        TypeIdsSection typeIds = file.getTypeIds();
-        typeIds.intern(type);
-    }
+    this.type = type;
+  }
 
-    /**
-     * Gets the type constant for the defining class of the
-     * reference.
-     *
-     * @return {@code non-null;} the type constant
-     */
-    public final CstType getDefiningClass() {
-        return type;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public void addContents(DexFile file) {
+    TypeIdsSection typeIds = file.getTypeIds();
+    typeIds.intern(type);
+  }
+
+  /**
+   * Gets the type constant for the defining class of the reference.
+   *
+   * @return {@code non-null;} the type constant
+   */
+  public final CstType getDefiningClass() {
+    return type;
+  }
 }

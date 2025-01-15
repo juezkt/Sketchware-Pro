@@ -16,15 +16,13 @@
 
 package mod.agus.jcoderz.dex.util;
 
-/**
- * A byte sink.
- */
+/** A byte sink. */
 public interface ByteOutput {
 
-    /**
-     * Writes a byte.
-     *
-     * @throws IndexOutOfBoundsException if all bytes have been written.
-     */
-    void writeByte(int i);
+  /**
+   * Writes a byte.
+   *
+   * @throws IndexOutOfBoundsException if all bytes have been written.
+   */
+  void writeByte(int i);
 }

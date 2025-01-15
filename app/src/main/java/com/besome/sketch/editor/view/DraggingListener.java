@@ -1,11 +1,11 @@
 package com.besome.sketch.editor.view;
 
 public interface DraggingListener {
-    boolean isAdmobEnabled();
+  boolean isAdmobEnabled();
 
-    void b();
+  void b();
 
-    boolean isGoogleMapEnabled();
+  boolean isGoogleMapEnabled();
 
-    void d();
+  void d();
 }

@@ -23,82 +23,80 @@ import mod.agus.jcoderz.dx.rop.cst.CstMethodHandle;
 import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 import mod.agus.jcoderz.dx.util.Hex;
 
-/**
- * Representation of a method handle in a DEX file.
- */
+/** Representation of a method handle in a DEX file. */
 public final class MethodHandleItem extends IndexedItem {
 
-    /** The item size when placed in a DEX file. */
-    private final int ITEM_SIZE = 8;
+  /** The item size when placed in a DEX file. */
+  private final int ITEM_SIZE = 8;
 
-    /** {@code non-null;} The method handle represented by this item. */
-    private final CstMethodHandle methodHandle;
+  /** {@code non-null;} The method handle represented by this item. */
+  private final CstMethodHandle methodHandle;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param methodHandle {@code non-null;} The method handle to represent in the DEX file.
-     */
-    public MethodHandleItem(CstMethodHandle methodHandle) {
-        this.methodHandle = methodHandle;
+  /**
+   * Constructs an instance.
+   *
+   * @param methodHandle {@code non-null;} The method handle to represent in the DEX file.
+   */
+  public MethodHandleItem(CstMethodHandle methodHandle) {
+    this.methodHandle = methodHandle;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ItemType itemType() {
+    return ItemType.TYPE_METHOD_HANDLE_ITEM;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int writeSize() {
+    return ITEM_SIZE;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void addContents(mod.agus.jcoderz.dx.dex.file.DexFile file) {
+    MethodHandlesSection methodHandles = file.getMethodHandles();
+    methodHandles.intern(methodHandle);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void writeTo(mod.agus.jcoderz.dx.dex.file.DexFile file, AnnotatedOutput out) {
+    int targetIndex = getTargetIndex(file);
+    int mhType = methodHandle.getMethodHandleType();
+    if (out.annotates()) {
+      out.annotate(0, indexString() + ' ' + methodHandle.toString());
+      String typeComment = " // " + CstMethodHandle.getMethodHandleTypeName(mhType);
+      out.annotate(2, "type:     " + Hex.u2(mhType) + typeComment);
+      out.annotate(2, "reserved: " + Hex.u2(0));
+      String targetComment = " // " + methodHandle.getRef().toString();
+      if (methodHandle.isAccessor()) {
+        out.annotate(2, "fieldId:  " + Hex.u2(targetIndex) + targetComment);
+      } else {
+        out.annotate(2, "methodId: " + Hex.u2(targetIndex) + targetComment);
+      }
+      out.annotate(2, "reserved: " + Hex.u2(0));
     }
+    out.writeShort(mhType);
+    out.writeShort(0);
+    out.writeShort(getTargetIndex(file));
+    out.writeShort(0);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public ItemType itemType() {
-        return ItemType.TYPE_METHOD_HANDLE_ITEM;
+  private int getTargetIndex(DexFile file) {
+    Constant ref = methodHandle.getRef();
+    if (methodHandle.isAccessor()) {
+      FieldIdsSection fieldIds = file.getFieldIds();
+      return fieldIds.indexOf((CstFieldRef) ref);
+    } else if (methodHandle.isInvocation()) {
+      if (ref instanceof CstInterfaceMethodRef) {
+        ref = ((CstInterfaceMethodRef) ref).toMethodRef();
+      }
+      MethodIdsSection methodIds = file.getMethodIds();
+      return methodIds.indexOf((CstBaseMethodRef) ref);
+    } else {
+      throw new IllegalStateException("Unhandled invocation type");
     }
-
-    /** {@inheritDoc} */
-    @Override
-    public int writeSize() {
-        return ITEM_SIZE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void addContents(mod.agus.jcoderz.dx.dex.file.DexFile file) {
-        MethodHandlesSection methodHandles = file.getMethodHandles();
-        methodHandles.intern(methodHandle);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(mod.agus.jcoderz.dx.dex.file.DexFile file, AnnotatedOutput out) {
-        int targetIndex = getTargetIndex(file);
-        int mhType = methodHandle.getMethodHandleType();
-        if (out.annotates()) {
-            out.annotate(0, indexString() + ' ' + methodHandle.toString());
-            String typeComment = " // " + CstMethodHandle.getMethodHandleTypeName(mhType);
-            out.annotate(2, "type:     " + Hex.u2(mhType) + typeComment);
-            out.annotate(2, "reserved: " + Hex.u2(0));
-            String targetComment = " // " +  methodHandle.getRef().toString();
-            if (methodHandle.isAccessor()) {
-                out.annotate(2, "fieldId:  " + Hex.u2(targetIndex) + targetComment);
-            } else {
-                out.annotate(2, "methodId: " + Hex.u2(targetIndex) + targetComment);
-            }
-            out.annotate(2, "reserved: " + Hex.u2(0));
-        }
-        out.writeShort(mhType);
-        out.writeShort(0);
-        out.writeShort(getTargetIndex(file));
-        out.writeShort(0);
-    }
-
-    private int getTargetIndex(DexFile file) {
-        Constant ref = methodHandle.getRef();
-        if (methodHandle.isAccessor()) {
-            FieldIdsSection fieldIds = file.getFieldIds();
-            return fieldIds.indexOf((CstFieldRef) ref);
-        } else if (methodHandle.isInvocation()) {
-            if (ref instanceof CstInterfaceMethodRef) {
-                ref = ((CstInterfaceMethodRef)ref).toMethodRef();
-            }
-            MethodIdsSection methodIds = file.getMethodIds();
-            return methodIds.indexOf((CstBaseMethodRef) ref);
-        } else {
-            throw new IllegalStateException("Unhandled invocation type");
-        }
-    }
+  }
 }

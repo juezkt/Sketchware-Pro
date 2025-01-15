@@ -1,52 +1,47 @@
 package com.besome.sketch.projects;
 
+import a.a.a.wB;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.DrawableRes;
-
 import pro.sketchware.R;
 
-import a.a.a.wB;
-
 public class MyProjectButton extends LinearLayout {
-    private int id;
-    private ImageView icon;
-    private TextView name;
+  private int id;
+  private ImageView icon;
+  private TextView name;
 
-    public MyProjectButton(Context context) {
-        this(context, null);
-    }
+  public MyProjectButton(Context context) {
+    this(context, null);
+  }
 
-    public MyProjectButton(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
-        initialize(context);
-    }
+  public MyProjectButton(Context context, AttributeSet attributeSet) {
+    super(context, attributeSet);
+    initialize(context);
+  }
 
-    private void initialize(Context context) {
-        setLayoutParams(new LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1.0f));
+  private void initialize(Context context) {
+    setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
 
-        wB.a(context, this, R.layout.myproject_button);
-        icon = findViewById(R.id.icon);
-        name = findViewById(R.id.name);
-    }
+    wB.a(context, this, R.layout.myproject_button);
+    icon = findViewById(R.id.icon);
+    name = findViewById(R.id.name);
+  }
 
-    public int getButtonId() {
-        return id;
-    }
+  public int getButtonId() {
+    return id;
+  }
 
-    public static MyProjectButton create(Context context, int id, @DrawableRes int resId, String label) {
-        MyProjectButton button = new MyProjectButton(context);
-        button.id = id;
-        button.icon.setImageResource(resId);
-        button.name.setText(label);
-        return button;
-    }
+  public static MyProjectButton create(
+      Context context, int id, @DrawableRes int resId, String label) {
+    MyProjectButton button = new MyProjectButton(context);
+    button.id = id;
+    button.icon.setImageResource(resId);
+    button.name.setText(label);
+    return button;
+  }
 }

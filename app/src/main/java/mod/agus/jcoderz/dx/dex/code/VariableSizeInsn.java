@@ -19,31 +19,27 @@ package mod.agus.jcoderz.dx.dex.code;
 import mod.agus.jcoderz.dx.rop.code.RegisterSpecList;
 import mod.agus.jcoderz.dx.rop.code.SourcePosition;
 
-/**
- * Pseudo-instruction base class for variable-sized instructions.
- */
+/** Pseudo-instruction base class for variable-sized instructions. */
 public abstract class VariableSizeInsn extends mod.agus.jcoderz.dx.dex.code.DalvInsn {
-    /**
-     * Constructs an instance. The output address of this instance is initially
-     * unknown ({@code -1}).
-     *
-     * @param position {@code non-null;} source position
-     * @param registers {@code non-null;} source registers
-     */
-    public VariableSizeInsn(SourcePosition position,
-                            RegisterSpecList registers) {
-        super(Dops.SPECIAL_FORMAT, position, registers);
-    }
+  /**
+   * Constructs an instance. The output address of this instance is initially unknown ({@code -1}).
+   *
+   * @param position {@code non-null;} source position
+   * @param registers {@code non-null;} source registers
+   */
+  public VariableSizeInsn(SourcePosition position, RegisterSpecList registers) {
+    super(Dops.SPECIAL_FORMAT, position, registers);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final mod.agus.jcoderz.dx.dex.code.DalvInsn withOpcode(Dop opcode) {
-        throw new RuntimeException("unsupported");
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final mod.agus.jcoderz.dx.dex.code.DalvInsn withOpcode(Dop opcode) {
+    throw new RuntimeException("unsupported");
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final DalvInsn withRegisterOffset(int delta) {
-        return withRegisters(getRegisters().withOffset(delta));
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final DalvInsn withRegisterOffset(int delta) {
+    return withRegisters(getRegisters().withOffset(delta));
+  }
 }

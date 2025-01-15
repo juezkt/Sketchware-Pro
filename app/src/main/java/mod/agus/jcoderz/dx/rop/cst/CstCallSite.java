@@ -19,92 +19,89 @@ package mod.agus.jcoderz.dx.rop.cst;
 import mod.agus.jcoderz.dx.cf.code.BootstrapMethodArgumentsList;
 import mod.agus.jcoderz.dx.rop.type.Prototype;
 
-/**
- * Constant type to represent a call site.
- */
+/** Constant type to represent a call site. */
 public final class CstCallSite extends CstArray {
-    /**
-     * Creates an instance of a {@code CstCallSite}.
-     *
-     * @param bootstrapHandle {@code non-null;} the bootstrap method handle to invoke
-     * @param nat {@code non-null;} the name and type to be resolved by the bootstrap method handle
-     * @param optionalArguments {@code null-ok;} optional arguments to provide to the bootstrap
-     *     method
-     * @return a new {@code CstCallSite} instance
-     */
-    public static CstCallSite make(CstMethodHandle bootstrapHandle, CstNat nat,
-                                   BootstrapMethodArgumentsList optionalArguments) {
-        if (bootstrapHandle == null) {
-            throw new NullPointerException("bootstrapMethodHandle == null");
-        } else if (nat == null) {
-            throw new NullPointerException("nat == null");
-        }
-
-        List list = new List(3 + optionalArguments.size());
-        list.set(0, bootstrapHandle);
-        list.set(1, nat.getName());
-        list.set(2, new CstProtoRef(Prototype.fromDescriptor(nat.getDescriptor().getString())));
-        if (optionalArguments != null) {
-            for (int i = 0; i < optionalArguments.size(); ++i) {
-                list.set(i + 3, optionalArguments.get(i));
-            }
-        }
-        list.setImmutable();
-        return new CstCallSite(list);
+  /**
+   * Creates an instance of a {@code CstCallSite}.
+   *
+   * @param bootstrapHandle {@code non-null;} the bootstrap method handle to invoke
+   * @param nat {@code non-null;} the name and type to be resolved by the bootstrap method handle
+   * @param optionalArguments {@code null-ok;} optional arguments to provide to the bootstrap method
+   * @return a new {@code CstCallSite} instance
+   */
+  public static CstCallSite make(
+      CstMethodHandle bootstrapHandle, CstNat nat, BootstrapMethodArgumentsList optionalArguments) {
+    if (bootstrapHandle == null) {
+      throw new NullPointerException("bootstrapMethodHandle == null");
+    } else if (nat == null) {
+      throw new NullPointerException("nat == null");
     }
 
-    /**
-     * Constructs an instance.
-     *
-     * @param list {@code non-null;} the actual list of contents
-     */
-    private CstCallSite(List list) {
-        super(list);
+    List list = new List(3 + optionalArguments.size());
+    list.set(0, bootstrapHandle);
+    list.set(1, nat.getName());
+    list.set(2, new CstProtoRef(Prototype.fromDescriptor(nat.getDescriptor().getString())));
+    if (optionalArguments != null) {
+      for (int i = 0; i < optionalArguments.size(); ++i) {
+        list.set(i + 3, optionalArguments.get(i));
+      }
     }
+    list.setImmutable();
+    return new CstCallSite(list);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof CstCallSite) {
-            return getList().equals(((CstCallSite) other).getList());
-        } else {
-            return false;
-        }
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param list {@code non-null;} the actual list of contents
+   */
+  private CstCallSite(List list) {
+    super(list);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int hashCode() {
-        return getList().hashCode();
+  /** {@inheritDoc} */
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof CstCallSite) {
+      return getList().equals(((CstCallSite) other).getList());
+    } else {
+      return false;
     }
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected int compareTo0(Constant other) {
-        return getList().compareTo(((CstCallSite) other).getList());
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int hashCode() {
+    return getList().hashCode();
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return getList().toString("call site{", ", ", "}");
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected int compareTo0(Constant other) {
+    return getList().compareTo(((CstCallSite) other).getList());
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public String typeName() {
-        return "call site";
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return getList().toString("call site{", ", ", "}");
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean isCategory2() {
-        return false;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String typeName() {
+    return "call site";
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toHuman() {
-        return getList().toHuman("{", ", ", "}");
-    }
+  /** {@inheritDoc} */
+  @Override
+  public boolean isCategory2() {
+    return false;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toHuman() {
+    return getList().toHuman("{", ", ", "}");
+  }
 }

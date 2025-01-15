@@ -24,63 +24,60 @@ import mod.agus.jcoderz.dx.rop.code.AccessFlags;
 import mod.agus.jcoderz.dx.rop.cst.CstNat;
 import mod.agus.jcoderz.dx.rop.cst.CstType;
 
-/**
- * Parser for lists of fields in a class file.
- */
+/** Parser for lists of fields in a class file. */
 final /*package*/ class FieldListParser extends mod.agus.jcoderz.dx.cf.direct.MemberListParser {
-    /** {@code non-null;} list in progress */
-    private final mod.agus.jcoderz.dx.cf.iface.StdFieldList fields;
+  /** {@code non-null;} list in progress */
+  private final mod.agus.jcoderz.dx.cf.iface.StdFieldList fields;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param cf {@code non-null;} the class file to parse from
-     * @param definer {@code non-null;} class being defined
-     * @param offset offset in {@code bytes} to the start of the list
-     * @param attributeFactory {@code non-null;} attribute factory to use
-     */
-    public FieldListParser(DirectClassFile cf, CstType definer, int offset,
-                           AttributeFactory attributeFactory) {
-        super(cf, definer, offset, attributeFactory);
-        fields = new mod.agus.jcoderz.dx.cf.iface.StdFieldList(getCount());
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param cf {@code non-null;} the class file to parse from
+   * @param definer {@code non-null;} class being defined
+   * @param offset offset in {@code bytes} to the start of the list
+   * @param attributeFactory {@code non-null;} attribute factory to use
+   */
+  public FieldListParser(
+      DirectClassFile cf, CstType definer, int offset, AttributeFactory attributeFactory) {
+    super(cf, definer, offset, attributeFactory);
+    fields = new mod.agus.jcoderz.dx.cf.iface.StdFieldList(getCount());
+  }
 
-    /**
-     * Gets the parsed list.
-     *
-     * @return {@code non-null;} the parsed list
-     */
-    public StdFieldList getList() {
-        parseIfNecessary();
-        return fields;
-    }
+  /**
+   * Gets the parsed list.
+   *
+   * @return {@code non-null;} the parsed list
+   */
+  public StdFieldList getList() {
+    parseIfNecessary();
+    return fields;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected String humanName() {
-        return "field";
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected String humanName() {
+    return "field";
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected String humanAccessFlags(int accessFlags) {
-        return AccessFlags.fieldString(accessFlags);
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected String humanAccessFlags(int accessFlags) {
+    return AccessFlags.fieldString(accessFlags);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected int getAttributeContext() {
-        return AttributeFactory.CTX_FIELD;
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected int getAttributeContext() {
+    return AttributeFactory.CTX_FIELD;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Member set(int n, int accessFlags, CstNat nat,
-                         AttributeList attributes) {
-        mod.agus.jcoderz.dx.cf.iface.StdField field =
-            new StdField(getDefiner(), accessFlags, nat, attributes);
+  /** {@inheritDoc} */
+  @Override
+  protected Member set(int n, int accessFlags, CstNat nat, AttributeList attributes) {
+    mod.agus.jcoderz.dx.cf.iface.StdField field =
+        new StdField(getDefiner(), accessFlags, nat, attributes);
 
-        fields.set(n, field);
-        return field;
-    }
+    fields.set(n, field);
+    return field;
+  }
 }

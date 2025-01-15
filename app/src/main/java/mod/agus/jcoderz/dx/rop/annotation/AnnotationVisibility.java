@@ -18,30 +18,28 @@ package mod.agus.jcoderz.dx.rop.annotation;
 
 import mod.agus.jcoderz.dx.util.ToHuman;
 
-/**
- * Visibility scope of an annotation.
- */
+/** Visibility scope of an annotation. */
 public enum AnnotationVisibility implements ToHuman {
-    RUNTIME("runtime"),
-    BUILD("build"),
-    SYSTEM("system"),
-    EMBEDDED("embedded");
+  RUNTIME("runtime"),
+  BUILD("build"),
+  SYSTEM("system"),
+  EMBEDDED("embedded");
 
-    /** {@code non-null;} the human-oriented string representation */
-    private final String human;
+  /** {@code non-null;} the human-oriented string representation */
+  private final String human;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param human {@code non-null;} the human-oriented string representation
-     */
-    private AnnotationVisibility(String human) {
-        this.human = human;
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param human {@code non-null;} the human-oriented string representation
+   */
+  private AnnotationVisibility(String human) {
+    this.human = human;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public String toHuman() {
-        return human;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public String toHuman() {
+    return human;
+  }
 }

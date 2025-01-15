@@ -18,51 +18,53 @@ package mod.agus.jcoderz.dx.io.instructions;
 
 import mod.agus.jcoderz.dx.io.IndexType;
 
-/**
- * A decoded Dalvik instruction which has two register arguments.
- */
-public final class TwoRegisterDecodedInstruction extends mod.agus.jcoderz.dx.io.instructions.DecodedInstruction {
-    /** register argument "A" */
-    private final int a;
+/** A decoded Dalvik instruction which has two register arguments. */
+public final class TwoRegisterDecodedInstruction
+    extends mod.agus.jcoderz.dx.io.instructions.DecodedInstruction {
+  /** register argument "A" */
+  private final int a;
 
-    /** register argument "B" */
-    private final int b;
+  /** register argument "B" */
+  private final int b;
 
-    /**
-     * Constructs an instance.
-     */
-    public TwoRegisterDecodedInstruction(InstructionCodec format, int opcode,
-                                         int index, IndexType indexType, int target, long literal,
-                                         int a, int b) {
-        super(format, opcode, index, indexType, target, literal);
+  /** Constructs an instance. */
+  public TwoRegisterDecodedInstruction(
+      InstructionCodec format,
+      int opcode,
+      int index,
+      IndexType indexType,
+      int target,
+      long literal,
+      int a,
+      int b) {
+    super(format, opcode, index, indexType, target, literal);
 
-        this.a = a;
-        this.b = b;
-    }
+    this.a = a;
+    this.b = b;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getRegisterCount() {
-        return 2;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int getRegisterCount() {
+    return 2;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getA() {
-        return a;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int getA() {
+    return a;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getB() {
-        return b;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int getB() {
+    return b;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public DecodedInstruction withIndex(int newIndex) {
-        return new TwoRegisterDecodedInstruction(
-                getFormat(), getOpcode(), newIndex, getIndexType(),
-                getTarget(), getLiteral(), a, b);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public DecodedInstruction withIndex(int newIndex) {
+    return new TwoRegisterDecodedInstruction(
+        getFormat(), getOpcode(), newIndex, getIndexType(), getTarget(), getLiteral(), a, b);
+  }
 }

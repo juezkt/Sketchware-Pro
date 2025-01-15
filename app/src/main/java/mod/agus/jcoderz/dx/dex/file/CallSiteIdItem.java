@@ -20,71 +20,69 @@ import mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef;
 import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 import mod.agus.jcoderz.dx.util.Hex;
 
-/**
- * Representation of a call site reference in a DEX file.
- */
+/** Representation of a call site reference in a DEX file. */
 public final class CallSiteIdItem extends IndexedItem implements Comparable {
 
-    /** The item size when placed in a DEX file. */
-    private static final int ITEM_SIZE = 4;
+  /** The item size when placed in a DEX file. */
+  private static final int ITEM_SIZE = 4;
 
-    /** {@code non-null;} The call site represented by this identifier. */
-    final mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef invokeDynamicRef;
+  /** {@code non-null;} The call site represented by this identifier. */
+  final mod.agus.jcoderz.dx.rop.cst.CstCallSiteRef invokeDynamicRef;
 
-    mod.agus.jcoderz.dx.dex.file.CallSiteItem data;
+  mod.agus.jcoderz.dx.dex.file.CallSiteItem data;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param invokeDynamicRef {@code non-null;} The call site to represent in the DEX file.
-     */
-    public CallSiteIdItem(CstCallSiteRef invokeDynamicRef) {
-        this.invokeDynamicRef = invokeDynamicRef;
-        this.data = null;
+  /**
+   * Constructs an instance.
+   *
+   * @param invokeDynamicRef {@code non-null;} The call site to represent in the DEX file.
+   */
+  public CallSiteIdItem(CstCallSiteRef invokeDynamicRef) {
+    this.invokeDynamicRef = invokeDynamicRef;
+    this.data = null;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ItemType itemType() {
+    return ItemType.TYPE_CALL_SITE_ID_ITEM;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int writeSize() {
+    return ITEM_SIZE;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void addContents(DexFile file) {
+    CstCallSite callSite = invokeDynamicRef.getCallSite();
+    CallSiteIdsSection callSiteIds = file.getCallSiteIds();
+    mod.agus.jcoderz.dx.dex.file.CallSiteItem callSiteItem = callSiteIds.getCallSiteItem(callSite);
+    if (callSiteItem == null) {
+      MixedItemSection byteData = file.getByteData();
+      callSiteItem = new CallSiteItem(callSite);
+      byteData.add(callSiteItem);
+      callSiteIds.addCallSiteItem(callSite, callSiteItem);
     }
+    this.data = callSiteItem;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public ItemType itemType() {
-        return ItemType.TYPE_CALL_SITE_ID_ITEM;
+  /** {@inheritDoc} */
+  @Override
+  public void writeTo(DexFile file, AnnotatedOutput out) {
+    int offset = data.getAbsoluteOffset();
+    if (out.annotates()) {
+      out.annotate(0, indexString() + ' ' + invokeDynamicRef.toString());
+      out.annotate(4, "call_site_off: " + Hex.u4(offset));
     }
+    out.writeInt(offset);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int writeSize() {
-        return ITEM_SIZE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void addContents(DexFile file) {
-        CstCallSite callSite = invokeDynamicRef.getCallSite();
-        CallSiteIdsSection callSiteIds = file.getCallSiteIds();
-        mod.agus.jcoderz.dx.dex.file.CallSiteItem callSiteItem = callSiteIds.getCallSiteItem(callSite);
-        if (callSiteItem == null) {
-            MixedItemSection byteData = file.getByteData();
-            callSiteItem = new CallSiteItem(callSite);
-            byteData.add(callSiteItem);
-            callSiteIds.addCallSiteItem(callSite, callSiteItem);
-        }
-        this.data = callSiteItem;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(DexFile file, AnnotatedOutput out) {
-        int offset = data.getAbsoluteOffset();
-        if (out.annotates()) {
-            out.annotate(0, indexString() + ' ' + invokeDynamicRef.toString());
-            out.annotate(4, "call_site_off: " + Hex.u4(offset));
-        }
-        out.writeInt(offset);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public int compareTo(Object o) {
-        CallSiteIdItem other = (CallSiteIdItem) o;
-        return invokeDynamicRef.compareTo(other.invokeDynamicRef);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int compareTo(Object o) {
+    CallSiteIdItem other = (CallSiteIdItem) o;
+    return invokeDynamicRef.compareTo(other.invokeDynamicRef);
+  }
 }

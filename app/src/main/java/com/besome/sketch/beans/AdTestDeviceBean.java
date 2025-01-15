@@ -2,69 +2,66 @@ package com.besome.sketch.beans;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import androidx.annotation.NonNull;
-
 import com.google.gson.annotations.Expose;
 
 public class AdTestDeviceBean implements Parcelable {
-    public static final Parcelable.Creator<AdTestDeviceBean> CREATOR = new Parcelable.Creator<>() {
+  public static final Parcelable.Creator<AdTestDeviceBean> CREATOR =
+      new Parcelable.Creator<>() {
         @Override
         public AdTestDeviceBean createFromParcel(Parcel source) {
-            return new AdTestDeviceBean(source);
+          return new AdTestDeviceBean(source);
         }
 
         @Override
         public AdTestDeviceBean[] newArray(int size) {
-            return new AdTestDeviceBean[size];
+          return new AdTestDeviceBean[size];
         }
-    };
+      };
 
-    @Expose
-    public String deviceId;
+  @Expose public String deviceId;
 
-    public AdTestDeviceBean() {
-        this("");
-    }
+  public AdTestDeviceBean() {
+    this("");
+  }
 
-    public AdTestDeviceBean(String str) {
-        deviceId = str;
-    }
+  public AdTestDeviceBean(String str) {
+    deviceId = str;
+  }
 
-    public AdTestDeviceBean(Parcel parcel) {
-        deviceId = parcel.readString();
-    }
+  public AdTestDeviceBean(Parcel parcel) {
+    deviceId = parcel.readString();
+  }
 
-    public static Parcelable.Creator<AdTestDeviceBean> getCreator() {
-        return CREATOR;
-    }
+  public static Parcelable.Creator<AdTestDeviceBean> getCreator() {
+    return CREATOR;
+  }
 
-    public void copy(AdTestDeviceBean adTestDeviceBean) {
-        deviceId = adTestDeviceBean.deviceId;
-    }
+  public void copy(AdTestDeviceBean adTestDeviceBean) {
+    deviceId = adTestDeviceBean.deviceId;
+  }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
+  @Override
+  public int describeContents() {
+    return 0;
+  }
 
-    public void print() {
-    }
+  public void print() {}
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(deviceId);
-    }
+  @Override
+  public void writeToParcel(Parcel parcel, int i) {
+    parcel.writeString(deviceId);
+  }
 
-    @Override
-    @NonNull
-    public AdTestDeviceBean clone() {
-        AdTestDeviceBean adTestDeviceBean = new AdTestDeviceBean();
-        adTestDeviceBean.copy(this);
-        return adTestDeviceBean;
-    }
+  @Override
+  @NonNull
+  public AdTestDeviceBean clone() {
+    AdTestDeviceBean adTestDeviceBean = new AdTestDeviceBean();
+    adTestDeviceBean.copy(this);
+    return adTestDeviceBean;
+  }
 
-    public String getDeviceId() {
-        return deviceId;
-    }
+  public String getDeviceId() {
+    return deviceId;
+  }
 }

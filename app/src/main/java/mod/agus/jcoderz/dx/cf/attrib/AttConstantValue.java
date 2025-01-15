@@ -23,56 +23,51 @@ import mod.agus.jcoderz.dx.rop.cst.CstLong;
 import mod.agus.jcoderz.dx.rop.cst.CstString;
 import mod.agus.jcoderz.dx.rop.cst.TypedConstant;
 
-/**
- * Attribute class for standard {@code ConstantValue} attributes.
- */
+/** Attribute class for standard {@code ConstantValue} attributes. */
 public final class AttConstantValue extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "ConstantValue";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "ConstantValue";
 
-    /** {@code non-null;} the constant value */
-    private final mod.agus.jcoderz.dx.rop.cst.TypedConstant constantValue;
+  /** {@code non-null;} the constant value */
+  private final mod.agus.jcoderz.dx.rop.cst.TypedConstant constantValue;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param constantValue {@code non-null;} the constant value, which must
-     * be an instance of one of: {@code CstString},
-     * {@code CstInteger}, {@code CstLong},
-     * {@code CstFloat}, or {@code CstDouble}
-     */
-    public AttConstantValue(mod.agus.jcoderz.dx.rop.cst.TypedConstant constantValue) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param constantValue {@code non-null;} the constant value, which must be an instance of one of:
+   *     {@code CstString}, {@code CstInteger}, {@code CstLong}, {@code CstFloat}, or {@code
+   *     CstDouble}
+   */
+  public AttConstantValue(mod.agus.jcoderz.dx.rop.cst.TypedConstant constantValue) {
+    super(ATTRIBUTE_NAME);
 
-        if (!((constantValue instanceof CstString) ||
-               (constantValue instanceof CstInteger) ||
-               (constantValue instanceof CstLong) ||
-               (constantValue instanceof CstFloat) ||
-               (constantValue instanceof CstDouble))) {
-            if (constantValue == null) {
-                throw new NullPointerException("constantValue == null");
-            }
-            throw new IllegalArgumentException("bad type for constantValue");
-        }
-
-        this.constantValue = constantValue;
+    if (!((constantValue instanceof CstString)
+        || (constantValue instanceof CstInteger)
+        || (constantValue instanceof CstLong)
+        || (constantValue instanceof CstFloat)
+        || (constantValue instanceof CstDouble))) {
+      if (constantValue == null) {
+        throw new NullPointerException("constantValue == null");
+      }
+      throw new IllegalArgumentException("bad type for constantValue");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return 8;
-    }
+    this.constantValue = constantValue;
+  }
 
-    /**
-     * Gets the constant value of this instance. The returned value
-     * is an instance of one of: {@code CstString},
-     * {@code CstInteger}, {@code CstLong},
-     * {@code CstFloat}, or {@code CstDouble}.
-     *
-     * @return {@code non-null;} the constant value
-     */
-    public TypedConstant getConstantValue() {
-        return constantValue;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return 8;
+  }
+
+  /**
+   * Gets the constant value of this instance. The returned value is an instance of one of: {@code
+   * CstString}, {@code CstInteger}, {@code CstLong}, {@code CstFloat}, or {@code CstDouble}.
+   *
+   * @return {@code non-null;} the constant value
+   */
+  public TypedConstant getConstantValue() {
+    return constantValue;
+  }
 }

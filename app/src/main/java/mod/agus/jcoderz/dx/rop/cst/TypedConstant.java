@@ -18,36 +18,33 @@ package mod.agus.jcoderz.dx.rop.cst;
 
 import mod.agus.jcoderz.dx.rop.type.TypeBearer;
 
-/**
- * Base class for constants which implement {@link TypeBearer}.
- */
-public abstract class TypedConstant
-        extends Constant implements TypeBearer {
-    /**
-     * {@inheritDoc}
-     *
-     * This implementation always returns {@code this}.
-     */
-    @Override
-    public final TypeBearer getFrameType() {
-        return this;
-    }
+/** Base class for constants which implement {@link TypeBearer}. */
+public abstract class TypedConstant extends Constant implements TypeBearer {
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This implementation always returns {@code this}.
+   */
+  @Override
+  public final TypeBearer getFrameType() {
+    return this;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final int getBasicType() {
-        return getType().getBasicType();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final int getBasicType() {
+    return getType().getBasicType();
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final int getBasicFrameType() {
-        return getType().getBasicFrameType();
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final int getBasicFrameType() {
+    return getType().getBasicFrameType();
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public final boolean isConstant() {
-        return true;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public final boolean isConstant() {
+    return true;
+  }
 }

@@ -1,5 +1,7 @@
 package dev.aldi.sayuti.editor.view.item;
 
+import a.a.a.sy;
+import a.a.a.wB;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,81 +10,80 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import com.besome.sketch.beans.ViewBean;
 import pro.sketchware.R;
 
-import a.a.a.sy;
-import a.a.a.wB;
-
 public class ItemCodeView extends LinearLayout implements sy {
 
-    private final Paint paint;
-    private final Rect rect;
-    private final float paddingFactor;
-    private ViewBean viewBean;
-    private boolean hasSelection;
-    private boolean hasFixed;
+  private final Paint paint;
+  private final Rect rect;
+  private final float paddingFactor;
+  private ViewBean viewBean;
+  private boolean hasSelection;
+  private boolean hasFixed;
 
-    public ItemCodeView(Context context) {
-        super(context);
-        paddingFactor = wB.a(context, 1.0f);
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(0x9599d5d0);
-        rect = new Rect();
+  public ItemCodeView(Context context) {
+    super(context);
+    paddingFactor = wB.a(context, 1.0f);
+    paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    paint.setColor(0x9599d5d0);
+    rect = new Rect();
 
-        setDrawingCacheEnabled(true);
-        ImageView imageView = new ImageView(getContext());
-        imageView.setLayoutParams(new LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-        imageView.setImageResource(R.drawable.item_code_view);
-        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        imageView.setPadding(0, 0, 0, 0);
-        addView(imageView);
-        setGravity(Gravity.CENTER);
+    setDrawingCacheEnabled(true);
+    ImageView imageView = new ImageView(getContext());
+    imageView.setLayoutParams(
+        new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    imageView.setImageResource(R.drawable.item_code_view);
+    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+    imageView.setPadding(0, 0, 0, 0);
+    addView(imageView);
+    setGravity(Gravity.CENTER);
+  }
+
+  @Override
+  public ViewBean getBean() {
+    return viewBean;
+  }
+
+  @Override
+  public void setBean(ViewBean viewBean) {
+    this.viewBean = viewBean;
+  }
+
+  @Override
+  public boolean getFixed() {
+    return hasFixed;
+  }
+
+  public void setFixed(boolean z) {
+    hasFixed = z;
+  }
+
+  public boolean getSelection() {
+    return hasSelection;
+  }
+
+  @Override
+  public void setSelection(boolean z) {
+    hasSelection = z;
+    invalidate();
+  }
+
+  @Override
+  public void onDraw(Canvas canvas) {
+    if (hasSelection) {
+      rect.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
+      canvas.drawRect(rect, paint);
     }
+    super.onDraw(canvas);
+  }
 
-    @Override
-    public ViewBean getBean() {
-        return viewBean;
-    }
-
-    @Override
-    public void setBean(ViewBean viewBean) {
-        this.viewBean = viewBean;
-    }
-
-    @Override
-    public boolean getFixed() {
-        return hasFixed;
-    }
-
-    public void setFixed(boolean z) {
-        hasFixed = z;
-    }
-
-    public boolean getSelection() {
-        return hasSelection;
-    }
-
-    @Override
-    public void setSelection(boolean z) {
-        hasSelection = z;
-        invalidate();
-    }
-
-    @Override
-    public void onDraw(Canvas canvas) {
-        if (hasSelection) {
-            rect.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
-            canvas.drawRect(rect, paint);
-        }
-        super.onDraw(canvas);
-    }
-
-    @Override
-    public void setPadding(int left, int top, int right, int bottom) {
-        super.setPadding((int) (left * paddingFactor), (int) (top * paddingFactor), (int) (right * paddingFactor), (int) (bottom * paddingFactor));
-    }
+  @Override
+  public void setPadding(int left, int top, int right, int bottom) {
+    super.setPadding(
+        (int) (left * paddingFactor),
+        (int) (top * paddingFactor),
+        (int) (right * paddingFactor),
+        (int) (bottom * paddingFactor));
+  }
 }

@@ -16,15 +16,13 @@
 
 package mod.agus.jcoderz.dex;
 
-/**
- * Thrown when there's an index overflow writing a dex file.
- */
+/** Thrown when there's an index overflow writing a dex file. */
 public final class DexIndexOverflowException extends DexException {
-    public DexIndexOverflowException(String message) {
-        super(message);
-    }
+  public DexIndexOverflowException(String message) {
+    super(message);
+  }
 
-    public DexIndexOverflowException(Throwable cause) {
-        super(cause);
-    }
+  public DexIndexOverflowException(Throwable cause) {
+    super(cause);
+  }
 }

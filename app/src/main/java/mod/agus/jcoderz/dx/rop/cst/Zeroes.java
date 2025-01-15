@@ -18,36 +18,31 @@ package mod.agus.jcoderz.dx.rop.cst;
 
 import mod.agus.jcoderz.dx.rop.type.Type;
 
-/**
- * Utility for turning types into zeroes.
- */
+/** Utility for turning types into zeroes. */
 public final class Zeroes {
-    /**
-     * This class is uninstantiable.
-     */
-    private Zeroes() {
-        // This space intentionally left blank.
-    }
+  /** This class is uninstantiable. */
+  private Zeroes() {
+    // This space intentionally left blank.
+  }
 
-    /**
-     * Gets the "zero" (or {@code null}) value for the given type.
-     *
-     * @param type {@code non-null;} the type in question
-     * @return {@code non-null;} its "zero" value
-     */
-    public static Constant zeroFor(Type type) {
-        return switch (type.getBasicType()) {
-            case Type.BT_BOOLEAN -> CstBoolean.VALUE_FALSE;
-            case Type.BT_BYTE -> CstByte.VALUE_0;
-            case Type.BT_CHAR -> CstChar.VALUE_0;
-            case Type.BT_DOUBLE -> CstDouble.VALUE_0;
-            case Type.BT_FLOAT -> CstFloat.VALUE_0;
-            case Type.BT_INT -> CstInteger.VALUE_0;
-            case Type.BT_LONG -> CstLong.VALUE_0;
-            case Type.BT_SHORT -> CstShort.VALUE_0;
-            case Type.BT_OBJECT -> CstKnownNull.THE_ONE;
-            default -> throw new UnsupportedOperationException("no zero for type: " +
-                    type.toHuman());
-        };
-    }
+  /**
+   * Gets the "zero" (or {@code null}) value for the given type.
+   *
+   * @param type {@code non-null;} the type in question
+   * @return {@code non-null;} its "zero" value
+   */
+  public static Constant zeroFor(Type type) {
+    return switch (type.getBasicType()) {
+      case Type.BT_BOOLEAN -> CstBoolean.VALUE_FALSE;
+      case Type.BT_BYTE -> CstByte.VALUE_0;
+      case Type.BT_CHAR -> CstChar.VALUE_0;
+      case Type.BT_DOUBLE -> CstDouble.VALUE_0;
+      case Type.BT_FLOAT -> CstFloat.VALUE_0;
+      case Type.BT_INT -> CstInteger.VALUE_0;
+      case Type.BT_LONG -> CstLong.VALUE_0;
+      case Type.BT_SHORT -> CstShort.VALUE_0;
+      case Type.BT_OBJECT -> CstKnownNull.THE_ONE;
+      default -> throw new UnsupportedOperationException("no zero for type: " + type.toHuman());
+    };
+  }
 }

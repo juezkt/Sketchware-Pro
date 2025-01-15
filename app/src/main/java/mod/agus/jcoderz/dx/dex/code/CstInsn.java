@@ -23,214 +23,206 @@ import mod.agus.jcoderz.dx.rop.cst.CstString;
 import mod.agus.jcoderz.dx.util.Hex;
 
 /**
- * Instruction which has a single constant argument in addition
- * to all the normal instruction information.
+ * Instruction which has a single constant argument in addition to all the normal instruction
+ * information.
  */
 public final class CstInsn extends FixedSizeInsn {
-    /** {@code non-null;} the constant argument for this instruction */
-    private final mod.agus.jcoderz.dx.rop.cst.Constant constant;
+  /** {@code non-null;} the constant argument for this instruction */
+  private final mod.agus.jcoderz.dx.rop.cst.Constant constant;
 
-    /**
-     * {@code >= -1;} the constant pool index for {@link #constant}, or
-     * {@code -1} if not yet set
-     */
-    private int index;
+  /** {@code >= -1;} the constant pool index for {@link #constant}, or {@code -1} if not yet set */
+  private int index;
 
-    /**
-     * {@code >= -1;} the constant pool index for the class reference in
-     * {@link #constant} if any, or {@code -1} if not yet set
-     */
-    private int classIndex;
+  /**
+   * {@code >= -1;} the constant pool index for the class reference in {@link #constant} if any, or
+   * {@code -1} if not yet set
+   */
+  private int classIndex;
 
-    /**
-     * Constructs an instance. The output address of this instance is
-     * initially unknown ({@code -1}) as is the constant pool index.
-     *
-     * @param opcode the opcode; one of the constants from {@link Dops}
-     * @param position {@code non-null;} source position
-     * @param registers {@code non-null;} register list, including a
-     * result register if appropriate (that is, registers may be either
-     * ins or outs)
-     * @param constant {@code non-null;} constant argument
-     */
-    public CstInsn(mod.agus.jcoderz.dx.dex.code.Dop opcode, SourcePosition position,
-                   mod.agus.jcoderz.dx.rop.code.RegisterSpecList registers, mod.agus.jcoderz.dx.rop.cst.Constant constant) {
-        super(opcode, position, registers);
+  /**
+   * Constructs an instance. The output address of this instance is initially unknown ({@code -1})
+   * as is the constant pool index.
+   *
+   * @param opcode the opcode; one of the constants from {@link Dops}
+   * @param position {@code non-null;} source position
+   * @param registers {@code non-null;} register list, including a result register if appropriate
+   *     (that is, registers may be either ins or outs)
+   * @param constant {@code non-null;} constant argument
+   */
+  public CstInsn(
+      mod.agus.jcoderz.dx.dex.code.Dop opcode,
+      SourcePosition position,
+      mod.agus.jcoderz.dx.rop.code.RegisterSpecList registers,
+      mod.agus.jcoderz.dx.rop.cst.Constant constant) {
+    super(opcode, position, registers);
 
-        if (constant == null) {
-            throw new NullPointerException("constant == null");
-        }
-
-        this.constant = constant;
-        this.index = -1;
-        this.classIndex = -1;
+    if (constant == null) {
+      throw new NullPointerException("constant == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public mod.agus.jcoderz.dx.dex.code.DalvInsn withOpcode(Dop opcode) {
-        CstInsn result =
-            new CstInsn(opcode, getPosition(), getRegisters(), constant);
+    this.constant = constant;
+    this.index = -1;
+    this.classIndex = -1;
+  }
 
-        if (index >= 0) {
-            result.setIndex(index);
-        }
+  /** {@inheritDoc} */
+  @Override
+  public mod.agus.jcoderz.dx.dex.code.DalvInsn withOpcode(Dop opcode) {
+    CstInsn result = new CstInsn(opcode, getPosition(), getRegisters(), constant);
 
-        if (classIndex >= 0) {
-            result.setClassIndex(classIndex);
-        }
-
-        return result;
+    if (index >= 0) {
+      result.setIndex(index);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public DalvInsn withRegisters(RegisterSpecList registers) {
-        CstInsn result =
-            new CstInsn(getOpcode(), getPosition(), registers, constant);
-
-        if (index >= 0) {
-            result.setIndex(index);
-        }
-
-        if (classIndex >= 0) {
-            result.setClassIndex(classIndex);
-        }
-
-        return result;
+    if (classIndex >= 0) {
+      result.setClassIndex(classIndex);
     }
 
-    /**
-     * Gets the constant argument.
-     *
-     * @return {@code non-null;} the constant argument
-     */
-    public Constant getConstant() {
-        return constant;
+    return result;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public DalvInsn withRegisters(RegisterSpecList registers) {
+    CstInsn result = new CstInsn(getOpcode(), getPosition(), registers, constant);
+
+    if (index >= 0) {
+      result.setIndex(index);
     }
 
-    /**
-     * Gets the constant's index. It is only valid to call this after
-     * {@link #setIndex} has been called.
-     *
-     * @return {@code >= 0;} the constant pool index
-     */
-    public int getIndex() {
-        if (index < 0) {
-            throw new IllegalStateException("index not yet set for " + constant);
-        }
-
-        return index;
+    if (classIndex >= 0) {
+      result.setClassIndex(classIndex);
     }
 
-    /**
-     * Returns whether the constant's index has been set for this instance.
-     *
-     * @see #setIndex
-     *
-     * @return {@code true} iff the index has been set
-     */
-    public boolean hasIndex() {
-        return (index >= 0);
+    return result;
+  }
+
+  /**
+   * Gets the constant argument.
+   *
+   * @return {@code non-null;} the constant argument
+   */
+  public Constant getConstant() {
+    return constant;
+  }
+
+  /**
+   * Gets the constant's index. It is only valid to call this after {@link #setIndex} has been
+   * called.
+   *
+   * @return {@code >= 0;} the constant pool index
+   */
+  public int getIndex() {
+    if (index < 0) {
+      throw new IllegalStateException("index not yet set for " + constant);
     }
 
-    /**
-     * Sets the constant's index. It is only valid to call this method once
-     * per instance.
-     *
-     * @param index {@code index >= 0;} the constant pool index
-     */
-    public void setIndex(int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("index < 0");
-        }
+    return index;
+  }
 
-        if (this.index >= 0) {
-            throw new IllegalStateException("index already set");
-        }
+  /**
+   * Returns whether the constant's index has been set for this instance.
+   *
+   * @see #setIndex
+   * @return {@code true} iff the index has been set
+   */
+  public boolean hasIndex() {
+    return (index >= 0);
+  }
 
-        this.index = index;
+  /**
+   * Sets the constant's index. It is only valid to call this method once per instance.
+   *
+   * @param index {@code index >= 0;} the constant pool index
+   */
+  public void setIndex(int index) {
+    if (index < 0) {
+      throw new IllegalArgumentException("index < 0");
     }
 
-    /**
-     * Gets the constant's class index. It is only valid to call this after
-     * {@link #setClassIndex} has been called.
-     *
-     * @return {@code >= 0;} the constant's class's constant pool index
-     */
-    public int getClassIndex() {
-        if (classIndex < 0) {
-            throw new IllegalStateException("class index not yet set");
-        }
-
-        return classIndex;
+    if (this.index >= 0) {
+      throw new IllegalStateException("index already set");
     }
 
-    /**
-     * Returns whether the constant's class index has been set for this
-     * instance.
-     *
-     * @see #setClassIndex
-     *
-     * @return {@code true} iff the index has been set
-     */
-    public boolean hasClassIndex() {
-        return (classIndex >= 0);
+    this.index = index;
+  }
+
+  /**
+   * Gets the constant's class index. It is only valid to call this after {@link #setClassIndex} has
+   * been called.
+   *
+   * @return {@code >= 0;} the constant's class's constant pool index
+   */
+  public int getClassIndex() {
+    if (classIndex < 0) {
+      throw new IllegalStateException("class index not yet set");
     }
 
-    /**
-     * Sets the constant's class index. This is the constant pool index
-     * for the class referred to by this instance's constant. Only
-     * reference constants have a class, so it is only on instances
-     * with reference constants that this method should ever be
-     * called. It is only valid to call this method once per instance.
-     *
-     * @param index {@code index >= 0;} the constant's class's constant pool index
-     */
-    public void setClassIndex(int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("index < 0");
-        }
+    return classIndex;
+  }
 
-        if (this.classIndex >= 0) {
-            throw new IllegalStateException("class index already set");
-        }
+  /**
+   * Returns whether the constant's class index has been set for this instance.
+   *
+   * @see #setClassIndex
+   * @return {@code true} iff the index has been set
+   */
+  public boolean hasClassIndex() {
+    return (classIndex >= 0);
+  }
 
-        this.classIndex = index;
+  /**
+   * Sets the constant's class index. This is the constant pool index for the class referred to by
+   * this instance's constant. Only reference constants have a class, so it is only on instances
+   * with reference constants that this method should ever be called. It is only valid to call this
+   * method once per instance.
+   *
+   * @param index {@code index >= 0;} the constant's class's constant pool index
+   */
+  public void setClassIndex(int index) {
+    if (index < 0) {
+      throw new IllegalArgumentException("index < 0");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    protected String argString() {
-        return constant.toHuman();
+    if (this.classIndex >= 0) {
+      throw new IllegalStateException("class index already set");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String cstString() {
-        if (constant instanceof mod.agus.jcoderz.dx.rop.cst.CstString) {
-            return ((CstString) constant).toQuoted();
-        }
-        return constant.toHuman();
+    this.classIndex = index;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected String argString() {
+    return constant.toHuman();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String cstString() {
+    if (constant instanceof mod.agus.jcoderz.dx.rop.cst.CstString) {
+      return ((CstString) constant).toQuoted();
+    }
+    return constant.toHuman();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String cstComment() {
+    if (!hasIndex()) {
+      return "";
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String cstComment() {
-        if (!hasIndex()) {
-            return "";
-        }
+    StringBuilder sb = new StringBuilder(20);
+    sb.append(getConstant().typeName());
+    sb.append('@');
 
-        StringBuilder sb = new StringBuilder(20);
-        sb.append(getConstant().typeName());
-        sb.append('@');
-
-        if (index < 65536) {
-            sb.append(mod.agus.jcoderz.dx.util.Hex.u2(index));
-        } else {
-            sb.append(Hex.u4(index));
-        }
-
-        return sb.toString();
+    if (index < 65536) {
+      sb.append(mod.agus.jcoderz.dx.util.Hex.u2(index));
+    } else {
+      sb.append(Hex.u4(index));
     }
+
+    return sb.toString();
+  }
 }

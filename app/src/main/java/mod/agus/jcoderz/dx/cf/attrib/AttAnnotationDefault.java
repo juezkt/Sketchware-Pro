@@ -18,51 +18,51 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.rop.cst.Constant;
 
-/**
- * Attribute class for {@code AnnotationDefault} attributes.
- */
+/** Attribute class for {@code AnnotationDefault} attributes. */
 public final class AttAnnotationDefault extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "AnnotationDefault";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "AnnotationDefault";
 
-    /** {@code non-null;} the annotation default value */
-    private final mod.agus.jcoderz.dx.rop.cst.Constant value;
+  /** {@code non-null;} the annotation default value */
+  private final mod.agus.jcoderz.dx.rop.cst.Constant value;
 
-    /** {@code >= 0;} attribute data length in the original classfile (not
-     * including the attribute header) */
-    private final int byteLength;
+  /**
+   * {@code >= 0;} attribute data length in the original classfile (not including the attribute
+   * header)
+   */
+  private final int byteLength;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param value {@code non-null;} the annotation default value
-     * @param byteLength {@code >= 0;} attribute data length in the original
-     * classfile (not including the attribute header)
-     */
-    public AttAnnotationDefault(mod.agus.jcoderz.dx.rop.cst.Constant value, int byteLength) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param value {@code non-null;} the annotation default value
+   * @param byteLength {@code >= 0;} attribute data length in the original classfile (not including
+   *     the attribute header)
+   */
+  public AttAnnotationDefault(mod.agus.jcoderz.dx.rop.cst.Constant value, int byteLength) {
+    super(ATTRIBUTE_NAME);
 
-        if (value == null) {
-            throw new NullPointerException("value == null");
-        }
-
-        this.value = value;
-        this.byteLength = byteLength;
+    if (value == null) {
+      throw new NullPointerException("value == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        // Add six for the standard attribute header.
-        return byteLength + 6;
-    }
+    this.value = value;
+    this.byteLength = byteLength;
+  }
 
-    /**
-     * Gets the annotation default value.
-     *
-     * @return {@code non-null;} the value
-     */
-    public Constant getValue() {
-        return value;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    // Add six for the standard attribute header.
+    return byteLength + 6;
+  }
+
+  /**
+   * Gets the annotation default value.
+   *
+   * @return {@code non-null;} the value
+   */
+  public Constant getValue() {
+    return value;
+  }
 }

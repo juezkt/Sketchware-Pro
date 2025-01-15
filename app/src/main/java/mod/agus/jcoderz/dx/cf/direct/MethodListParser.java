@@ -24,63 +24,60 @@ import mod.agus.jcoderz.dx.rop.code.AccessFlags;
 import mod.agus.jcoderz.dx.rop.cst.CstNat;
 import mod.agus.jcoderz.dx.rop.cst.CstType;
 
-/**
- * Parser for lists of methods in a class file.
- */
+/** Parser for lists of methods in a class file. */
 final /*package*/ class MethodListParser extends mod.agus.jcoderz.dx.cf.direct.MemberListParser {
-    /** {@code non-null;} list in progress */
-    final private mod.agus.jcoderz.dx.cf.iface.StdMethodList methods;
+  /** {@code non-null;} list in progress */
+  private final mod.agus.jcoderz.dx.cf.iface.StdMethodList methods;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param cf {@code non-null;} the class file to parse from
-     * @param definer {@code non-null;} class being defined
-     * @param offset offset in {@code bytes} to the start of the list
-     * @param attributeFactory {@code non-null;} attribute factory to use
-     */
-    public MethodListParser(DirectClassFile cf, CstType definer,
-            int offset, AttributeFactory attributeFactory) {
-        super(cf, definer, offset, attributeFactory);
-        methods = new mod.agus.jcoderz.dx.cf.iface.StdMethodList(getCount());
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param cf {@code non-null;} the class file to parse from
+   * @param definer {@code non-null;} class being defined
+   * @param offset offset in {@code bytes} to the start of the list
+   * @param attributeFactory {@code non-null;} attribute factory to use
+   */
+  public MethodListParser(
+      DirectClassFile cf, CstType definer, int offset, AttributeFactory attributeFactory) {
+    super(cf, definer, offset, attributeFactory);
+    methods = new mod.agus.jcoderz.dx.cf.iface.StdMethodList(getCount());
+  }
 
-    /**
-     * Gets the parsed list.
-     *
-     * @return {@code non-null;} the parsed list
-     */
-    public StdMethodList getList() {
-        parseIfNecessary();
-        return methods;
-    }
+  /**
+   * Gets the parsed list.
+   *
+   * @return {@code non-null;} the parsed list
+   */
+  public StdMethodList getList() {
+    parseIfNecessary();
+    return methods;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected String humanName() {
-        return "method";
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected String humanName() {
+    return "method";
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected String humanAccessFlags(int accessFlags) {
-        return AccessFlags.methodString(accessFlags);
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected String humanAccessFlags(int accessFlags) {
+    return AccessFlags.methodString(accessFlags);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected int getAttributeContext() {
-        return AttributeFactory.CTX_METHOD;
-    }
+  /** {@inheritDoc} */
+  @Override
+  protected int getAttributeContext() {
+    return AttributeFactory.CTX_METHOD;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected Member set(int n, int accessFlags, CstNat nat,
-                         AttributeList attributes) {
-        mod.agus.jcoderz.dx.cf.iface.StdMethod meth =
-            new StdMethod(getDefiner(), accessFlags, nat, attributes);
+  /** {@inheritDoc} */
+  @Override
+  protected Member set(int n, int accessFlags, CstNat nat, AttributeList attributes) {
+    mod.agus.jcoderz.dx.cf.iface.StdMethod meth =
+        new StdMethod(getDefiner(), accessFlags, nat, attributes);
 
-        methods.set(n, meth);
-        return meth;
-    }
+    methods.set(n, meth);
+    return meth;
+  }
 }

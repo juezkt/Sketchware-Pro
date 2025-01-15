@@ -18,29 +18,30 @@ package mod.agus.jcoderz.dx.io.instructions;
 
 import mod.agus.jcoderz.dx.io.IndexType;
 
-/**
- * A decoded Dalvik instruction which has no register arguments.
- */
-public final class ZeroRegisterDecodedInstruction extends mod.agus.jcoderz.dx.io.instructions.DecodedInstruction {
-    /**
-     * Constructs an instance.
-     */
-    public ZeroRegisterDecodedInstruction(InstructionCodec format, int opcode,
-                                          int index, IndexType indexType, int target, long literal) {
-        super(format, opcode, index, indexType, target, literal);
-    }
+/** A decoded Dalvik instruction which has no register arguments. */
+public final class ZeroRegisterDecodedInstruction
+    extends mod.agus.jcoderz.dx.io.instructions.DecodedInstruction {
+  /** Constructs an instance. */
+  public ZeroRegisterDecodedInstruction(
+      InstructionCodec format,
+      int opcode,
+      int index,
+      IndexType indexType,
+      int target,
+      long literal) {
+    super(format, opcode, index, indexType, target, literal);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int getRegisterCount() {
-        return 0;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int getRegisterCount() {
+    return 0;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public DecodedInstruction withIndex(int newIndex) {
-        return new ZeroRegisterDecodedInstruction(
-                getFormat(), getOpcode(), newIndex, getIndexType(),
-                getTarget(), getLiteral());
-    }
+  /** {@inheritDoc} */
+  @Override
+  public DecodedInstruction withIndex(int newIndex) {
+    return new ZeroRegisterDecodedInstruction(
+        getFormat(), getOpcode(), newIndex, getIndexType(), getTarget(), getLiteral());
+  }
 }

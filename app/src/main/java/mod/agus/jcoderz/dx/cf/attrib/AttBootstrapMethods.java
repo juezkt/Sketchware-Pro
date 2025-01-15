@@ -17,43 +17,42 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.cf.code.BootstrapMethodsList;
 
-/**
- * Attribute class for standard {@code AttBootstrapMethods} attributes.
- */
+/** Attribute class for standard {@code AttBootstrapMethods} attributes. */
 public class AttBootstrapMethods extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "BootstrapMethods";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "BootstrapMethods";
 
-    private static final int ATTRIBUTE_HEADER_BYTES = 8;
-    private static final int BOOTSTRAP_METHOD_BYTES = 4;
-    private static final int BOOTSTRAP_ARGUMENT_BYTES = 2;
+  private static final int ATTRIBUTE_HEADER_BYTES = 8;
+  private static final int BOOTSTRAP_METHOD_BYTES = 4;
+  private static final int BOOTSTRAP_ARGUMENT_BYTES = 2;
 
-    private final mod.agus.jcoderz.dx.cf.code.BootstrapMethodsList bootstrapMethods;
+  private final mod.agus.jcoderz.dx.cf.code.BootstrapMethodsList bootstrapMethods;
 
-    private final int byteLength;
+  private final int byteLength;
 
-    public AttBootstrapMethods(mod.agus.jcoderz.dx.cf.code.BootstrapMethodsList bootstrapMethods) {
-        super(ATTRIBUTE_NAME);
-        this.bootstrapMethods = bootstrapMethods;
+  public AttBootstrapMethods(mod.agus.jcoderz.dx.cf.code.BootstrapMethodsList bootstrapMethods) {
+    super(ATTRIBUTE_NAME);
+    this.bootstrapMethods = bootstrapMethods;
 
-        int bytes = ATTRIBUTE_HEADER_BYTES + bootstrapMethods.size() * BOOTSTRAP_METHOD_BYTES;
-        for (int i = 0; i < bootstrapMethods.size(); ++i) {
-            int numberOfArguments = bootstrapMethods.get(i).getBootstrapMethodArguments().size();
-            bytes += numberOfArguments * BOOTSTRAP_ARGUMENT_BYTES;
-        }
-        this.byteLength = bytes;
+    int bytes = ATTRIBUTE_HEADER_BYTES + bootstrapMethods.size() * BOOTSTRAP_METHOD_BYTES;
+    for (int i = 0; i < bootstrapMethods.size(); ++i) {
+      int numberOfArguments = bootstrapMethods.get(i).getBootstrapMethodArguments().size();
+      bytes += numberOfArguments * BOOTSTRAP_ARGUMENT_BYTES;
     }
+    this.byteLength = bytes;
+  }
 
-    @Override
-    public int byteLength() {
-        return byteLength;
-    }
+  @Override
+  public int byteLength() {
+    return byteLength;
+  }
 
-    /**
-     * Get the bootstrap methods present in attribute.
-     * @return bootstrap methods list
-     */
-    public BootstrapMethodsList getBootstrapMethods() {
-        return bootstrapMethods;
-    }
+  /**
+   * Get the bootstrap methods present in attribute.
+   *
+   * @return bootstrap methods list
+   */
+  public BootstrapMethodsList getBootstrapMethods() {
+    return bootstrapMethods;
+  }
 }

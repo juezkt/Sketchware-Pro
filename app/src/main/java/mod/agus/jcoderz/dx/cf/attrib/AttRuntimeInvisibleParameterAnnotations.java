@@ -18,25 +18,20 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.rop.annotation.AnnotationsList;
 
-/**
- * Attribute class for standard
- * {@code RuntimeInvisibleParameterAnnotations} attributes.
- */
-public final class AttRuntimeInvisibleParameterAnnotations
-        extends BaseParameterAnnotations {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME =
-        "RuntimeInvisibleParameterAnnotations";
+/** Attribute class for standard {@code RuntimeInvisibleParameterAnnotations} attributes. */
+public final class AttRuntimeInvisibleParameterAnnotations extends BaseParameterAnnotations {
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "RuntimeInvisibleParameterAnnotations";
 
-    /**
-     * Constructs an instance.
-     *
-     * @param parameterAnnotations {@code non-null;} the parameter annotations
-     * @param byteLength {@code >= 0;} attribute data length in the original
-     * classfile (not including the attribute header)
-     */
-    public AttRuntimeInvisibleParameterAnnotations(
-            AnnotationsList parameterAnnotations, int byteLength) {
-        super(ATTRIBUTE_NAME, parameterAnnotations, byteLength);
-    }
+  /**
+   * Constructs an instance.
+   *
+   * @param parameterAnnotations {@code non-null;} the parameter annotations
+   * @param byteLength {@code >= 0;} attribute data length in the original classfile (not including
+   *     the attribute header)
+   */
+  public AttRuntimeInvisibleParameterAnnotations(
+      AnnotationsList parameterAnnotations, int byteLength) {
+    super(ATTRIBUTE_NAME, parameterAnnotations, byteLength);
+  }
 }

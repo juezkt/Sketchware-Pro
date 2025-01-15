@@ -19,48 +19,46 @@ package mod.agus.jcoderz.dx.cf.attrib;
 import mod.agus.jcoderz.dx.cf.code.LineNumberList;
 import mod.agus.jcoderz.dx.util.MutabilityException;
 
-/**
- * Attribute class for standard {@code LineNumberTable} attributes.
- */
+/** Attribute class for standard {@code LineNumberTable} attributes. */
 public final class AttLineNumberTable extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "LineNumberTable";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "LineNumberTable";
 
-    /** {@code non-null;} list of line number entries */
-    private final mod.agus.jcoderz.dx.cf.code.LineNumberList lineNumbers;
+  /** {@code non-null;} list of line number entries */
+  private final mod.agus.jcoderz.dx.cf.code.LineNumberList lineNumbers;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param lineNumbers {@code non-null;} list of line number entries
-     */
-    public AttLineNumberTable(mod.agus.jcoderz.dx.cf.code.LineNumberList lineNumbers) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param lineNumbers {@code non-null;} list of line number entries
+   */
+  public AttLineNumberTable(mod.agus.jcoderz.dx.cf.code.LineNumberList lineNumbers) {
+    super(ATTRIBUTE_NAME);
 
-        try {
-            if (lineNumbers.isMutable()) {
-                throw new MutabilityException("lineNumbers.isMutable()");
-            }
-        } catch (NullPointerException ex) {
-            // Translate the exception.
-            throw new NullPointerException("lineNumbers == null");
-        }
-
-        this.lineNumbers = lineNumbers;
+    try {
+      if (lineNumbers.isMutable()) {
+        throw new MutabilityException("lineNumbers.isMutable()");
+      }
+    } catch (NullPointerException ex) {
+      // Translate the exception.
+      throw new NullPointerException("lineNumbers == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return 8 + 4 * lineNumbers.size();
-    }
+    this.lineNumbers = lineNumbers;
+  }
 
-    /**
-     * Gets the list of "line number" entries associated with this instance.
-     *
-     * @return {@code non-null;} the list
-     */
-    public LineNumberList getLineNumbers() {
-        return lineNumbers;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return 8 + 4 * lineNumbers.size();
+  }
+
+  /**
+   * Gets the list of "line number" entries associated with this instance.
+   *
+   * @return {@code non-null;} the list
+   */
+  public LineNumberList getLineNumbers() {
+    return lineNumbers;
+  }
 }

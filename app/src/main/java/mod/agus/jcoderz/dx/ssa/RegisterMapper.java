@@ -21,63 +21,65 @@ import mod.agus.jcoderz.dx.rop.code.RegisterSpecList;
 import mod.agus.jcoderz.dx.rop.code.RegisterSpecSet;
 
 /**
- * Represents a mapping between two register numbering schemes.
- * Subclasses of this may be mutable, and as such the mapping provided
- * is only valid for the lifetime of the method call in which
+ * Represents a mapping between two register numbering schemes. Subclasses of this may be mutable,
+ * and as such the mapping provided is only valid for the lifetime of the method call in which
  * instances of this class are passed.
  */
 public abstract class RegisterMapper {
-    /**
-     * Gets the count of registers (really, the total register width, since
-     * category width is counted) in the new namespace.
-     * @return &ge; 0 width of new namespace.
-     */
-    public abstract int getNewRegisterCount();
+  /**
+   * Gets the count of registers (really, the total register width, since category width is counted)
+   * in the new namespace.
+   *
+   * @return &ge; 0 width of new namespace.
+   */
+  public abstract int getNewRegisterCount();
 
-    /**
-     * @param registerSpec old register
-     * @return register in new space
-     */
-    public abstract mod.agus.jcoderz.dx.rop.code.RegisterSpec map(mod.agus.jcoderz.dx.rop.code.RegisterSpec registerSpec);
+  /**
+   * @param registerSpec old register
+   * @return register in new space
+   */
+  public abstract mod.agus.jcoderz.dx.rop.code.RegisterSpec map(
+      mod.agus.jcoderz.dx.rop.code.RegisterSpec registerSpec);
 
-    /**
-     *
-     * @param sources old register list
-     * @return new mapped register list, or old if nothing has changed.
-     */
-    public final mod.agus.jcoderz.dx.rop.code.RegisterSpecList map(mod.agus.jcoderz.dx.rop.code.RegisterSpecList sources) {
-        int sz = sources.size();
-        mod.agus.jcoderz.dx.rop.code.RegisterSpecList newSources = new RegisterSpecList(sz);
+  /**
+   * @param sources old register list
+   * @return new mapped register list, or old if nothing has changed.
+   */
+  public final mod.agus.jcoderz.dx.rop.code.RegisterSpecList map(
+      mod.agus.jcoderz.dx.rop.code.RegisterSpecList sources) {
+    int sz = sources.size();
+    mod.agus.jcoderz.dx.rop.code.RegisterSpecList newSources = new RegisterSpecList(sz);
 
-        for (int i = 0; i < sz; i++) {
-            newSources.set(i, map(sources.get(i)));
-        }
-
-        newSources.setImmutable();
-
-        // Return the old sources if nothing has changed.
-        return newSources.equals(sources) ? sources : newSources;
+    for (int i = 0; i < sz; i++) {
+      newSources.set(i, map(sources.get(i)));
     }
 
-    /**
-     *
-     * @param sources old register set
-     * @return new mapped register set, or old if nothing has changed.
-     */
-    public final mod.agus.jcoderz.dx.rop.code.RegisterSpecSet map(mod.agus.jcoderz.dx.rop.code.RegisterSpecSet sources) {
-        int sz = sources.getMaxSize();
-        mod.agus.jcoderz.dx.rop.code.RegisterSpecSet newSources = new RegisterSpecSet(getNewRegisterCount());
+    newSources.setImmutable();
 
-        for (int i = 0; i < sz; i++) {
-            RegisterSpec registerSpec = sources.get(i);
-            if (registerSpec != null) {
-                newSources.put(map(registerSpec));
-            }
-        }
+    // Return the old sources if nothing has changed.
+    return newSources.equals(sources) ? sources : newSources;
+  }
 
-        newSources.setImmutable();
+  /**
+   * @param sources old register set
+   * @return new mapped register set, or old if nothing has changed.
+   */
+  public final mod.agus.jcoderz.dx.rop.code.RegisterSpecSet map(
+      mod.agus.jcoderz.dx.rop.code.RegisterSpecSet sources) {
+    int sz = sources.getMaxSize();
+    mod.agus.jcoderz.dx.rop.code.RegisterSpecSet newSources =
+        new RegisterSpecSet(getNewRegisterCount());
 
-        // Return the old sources if nothing has changed.
-        return newSources.equals(sources) ? sources : newSources;
+    for (int i = 0; i < sz; i++) {
+      RegisterSpec registerSpec = sources.get(i);
+      if (registerSpec != null) {
+        newSources.put(map(registerSpec));
+      }
     }
+
+    newSources.setImmutable();
+
+    // Return the old sources if nothing has changed.
+    return newSources.equals(sources) ? sources : newSources;
+  }
 }

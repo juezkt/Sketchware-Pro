@@ -16,23 +16,19 @@
 
 package mod.agus.jcoderz.dx.cf.attrib;
 
-/**
- * Attribute class for standard {@code Synthetic} attributes.
- */
+/** Attribute class for standard {@code Synthetic} attributes. */
 public final class AttSynthetic extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "Synthetic";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "Synthetic";
 
-    /**
-     * Constructs an instance.
-     */
-    public AttSynthetic() {
-        super(ATTRIBUTE_NAME);
-    }
+  /** Constructs an instance. */
+  public AttSynthetic() {
+    super(ATTRIBUTE_NAME);
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return 6;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return 6;
+  }
 }

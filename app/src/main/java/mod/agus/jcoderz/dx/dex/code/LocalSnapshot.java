@@ -23,81 +23,80 @@ import mod.agus.jcoderz.dx.rop.code.SourcePosition;
 import mod.agus.jcoderz.dx.ssa.RegisterMapper;
 
 /**
- * Pseudo-instruction which is used to hold a snapshot of the
- * state of local variable name mappings that exists immediately after
- * the instance in an instruction array.
+ * Pseudo-instruction which is used to hold a snapshot of the state of local variable name mappings
+ * that exists immediately after the instance in an instruction array.
  */
 public final class LocalSnapshot extends ZeroSizeInsn {
-    /** {@code non-null;} local state associated with this instance */
-    private final mod.agus.jcoderz.dx.rop.code.RegisterSpecSet locals;
+  /** {@code non-null;} local state associated with this instance */
+  private final mod.agus.jcoderz.dx.rop.code.RegisterSpecSet locals;
 
-    /**
-     * Constructs an instance. The output address of this instance is initially
-     * unknown ({@code -1}).
-     *
-     * @param position {@code non-null;} source position
-     * @param locals {@code non-null;} associated local variable state
-     */
-    public LocalSnapshot(SourcePosition position, mod.agus.jcoderz.dx.rop.code.RegisterSpecSet locals) {
-        super(position);
+  /**
+   * Constructs an instance. The output address of this instance is initially unknown ({@code -1}).
+   *
+   * @param position {@code non-null;} source position
+   * @param locals {@code non-null;} associated local variable state
+   */
+  public LocalSnapshot(
+      SourcePosition position, mod.agus.jcoderz.dx.rop.code.RegisterSpecSet locals) {
+    super(position);
 
-        if (locals == null) {
-            throw new NullPointerException("locals == null");
-        }
-
-        this.locals = locals;
+    if (locals == null) {
+      throw new NullPointerException("locals == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public mod.agus.jcoderz.dx.dex.code.DalvInsn withRegisterOffset(int delta) {
-        return new LocalSnapshot(getPosition(), locals.withOffset(delta));
+    this.locals = locals;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public mod.agus.jcoderz.dx.dex.code.DalvInsn withRegisterOffset(int delta) {
+    return new LocalSnapshot(getPosition(), locals.withOffset(delta));
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public mod.agus.jcoderz.dx.dex.code.DalvInsn withRegisters(RegisterSpecList registers) {
+    return new LocalSnapshot(getPosition(), locals);
+  }
+
+  /**
+   * Gets the local state associated with this instance.
+   *
+   * @return {@code non-null;} the state
+   */
+  public RegisterSpecSet getLocals() {
+    return locals;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected String argString() {
+    return locals.toString();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected String listingString0(boolean noteIndices) {
+    int sz = locals.size();
+    int max = locals.getMaxSize();
+    StringBuilder sb = new StringBuilder(100 + sz * 40);
+
+    sb.append("local-snapshot");
+
+    for (int i = 0; i < max; i++) {
+      RegisterSpec spec = locals.get(i);
+      if (spec != null) {
+        sb.append("\n  ");
+        sb.append(LocalStart.localString(spec));
+      }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public mod.agus.jcoderz.dx.dex.code.DalvInsn withRegisters(RegisterSpecList registers) {
-        return new LocalSnapshot(getPosition(), locals);
-    }
+    return sb.toString();
+  }
 
-    /**
-     * Gets the local state associated with this instance.
-     *
-     * @return {@code non-null;} the state
-     */
-    public RegisterSpecSet getLocals() {
-        return locals;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected String argString() {
-        return locals.toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected String listingString0(boolean noteIndices) {
-        int sz = locals.size();
-        int max = locals.getMaxSize();
-        StringBuilder sb = new StringBuilder(100 + sz * 40);
-
-        sb.append("local-snapshot");
-
-        for (int i = 0; i < max; i++) {
-            RegisterSpec spec = locals.get(i);
-            if (spec != null) {
-                sb.append("\n  ");
-                sb.append(LocalStart.localString(spec));
-            }
-        }
-
-        return sb.toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public DalvInsn withMapper(RegisterMapper mapper) {
-      return new LocalSnapshot(getPosition(), mapper.map(locals));
-    }
+  /** {@inheritDoc} */
+  @Override
+  public DalvInsn withMapper(RegisterMapper mapper) {
+    return new LocalSnapshot(getPosition(), mapper.map(locals));
+  }
 }

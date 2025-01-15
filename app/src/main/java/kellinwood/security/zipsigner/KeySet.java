@@ -1,5 +1,3 @@
-
-
 /*
  * Copyright (C) 2010 Ken Ellinwood
  *
@@ -22,77 +20,80 @@ import java.security.cert.X509Certificate;
 
 public class KeySet {
 
-    String name;
-    
-    // certificate
-    X509Certificate publicKey = null;
-    
-    // private key
-    PrivateKey privateKey = null; 
+  String name;
 
-    // signature block template
-    byte[] sigBlockTemplate = null;
+  // certificate
+  X509Certificate publicKey = null;
 
-    String signatureAlgorithm = "SHA1withRSA";
-    
-    public KeySet() {
-    }
-    
-    public KeySet( String name, X509Certificate publicKey, PrivateKey privateKey, byte[] sigBlockTemplate)
-    {
-        this.name = name;
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-        this.sigBlockTemplate = sigBlockTemplate;
-    }
+  // private key
+  PrivateKey privateKey = null;
 
-    public KeySet( String name, X509Certificate publicKey, PrivateKey privateKey, String signatureAlgorithm, byte[] sigBlockTemplate)
-    {
-        this.name = name;
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
-        if (signatureAlgorithm != null) this.signatureAlgorithm = signatureAlgorithm;
-        this.sigBlockTemplate = sigBlockTemplate;
-    }
+  // signature block template
+  byte[] sigBlockTemplate = null;
 
-    public String getName() {
-        return name;
-    }
+  String signatureAlgorithm = "SHA1withRSA";
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public KeySet() {}
 
-    public X509Certificate getPublicKey() {
-        return publicKey;
-    }
+  public KeySet(
+      String name, X509Certificate publicKey, PrivateKey privateKey, byte[] sigBlockTemplate) {
+    this.name = name;
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+    this.sigBlockTemplate = sigBlockTemplate;
+  }
 
-    public void setPublicKey(X509Certificate publicKey) {
-        this.publicKey = publicKey;
-    }
+  public KeySet(
+      String name,
+      X509Certificate publicKey,
+      PrivateKey privateKey,
+      String signatureAlgorithm,
+      byte[] sigBlockTemplate) {
+    this.name = name;
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+    if (signatureAlgorithm != null) this.signatureAlgorithm = signatureAlgorithm;
+    this.sigBlockTemplate = sigBlockTemplate;
+  }
 
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setPrivateKey(PrivateKey privateKey) {
-        this.privateKey = privateKey;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public byte[] getSigBlockTemplate() {
-        return sigBlockTemplate;
-    }
+  public X509Certificate getPublicKey() {
+    return publicKey;
+  }
 
-    public void setSigBlockTemplate(byte[] sigBlockTemplate) {
-        this.sigBlockTemplate = sigBlockTemplate;
-    }
+  public void setPublicKey(X509Certificate publicKey) {
+    this.publicKey = publicKey;
+  }
 
-    public String getSignatureAlgorithm() {
-        return signatureAlgorithm;
-    }
+  public PrivateKey getPrivateKey() {
+    return privateKey;
+  }
 
-    public void setSignatureAlgorithm(String signatureAlgorithm) {
-        if (signatureAlgorithm == null) signatureAlgorithm = "SHA1withRSA";
-        else this.signatureAlgorithm = signatureAlgorithm;
-    }
+  public void setPrivateKey(PrivateKey privateKey) {
+    this.privateKey = privateKey;
+  }
+
+  public byte[] getSigBlockTemplate() {
+    return sigBlockTemplate;
+  }
+
+  public void setSigBlockTemplate(byte[] sigBlockTemplate) {
+    this.sigBlockTemplate = sigBlockTemplate;
+  }
+
+  public String getSignatureAlgorithm() {
+    return signatureAlgorithm;
+  }
+
+  public void setSignatureAlgorithm(String signatureAlgorithm) {
+    if (signatureAlgorithm == null) signatureAlgorithm = "SHA1withRSA";
+    else this.signatureAlgorithm = signatureAlgorithm;
+  }
 }

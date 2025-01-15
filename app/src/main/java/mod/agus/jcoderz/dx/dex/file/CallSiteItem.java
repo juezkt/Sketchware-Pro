@@ -19,87 +19,85 @@ import mod.agus.jcoderz.dx.rop.cst.CstCallSite;
 import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 import mod.agus.jcoderz.dx.util.ByteArrayAnnotatedOutput;
 
-/**
- * Representation of a call site in a DEX file.
- */
+/** Representation of a call site in a DEX file. */
 public final class CallSiteItem extends OffsettedItem {
 
-    /** {@code non-null;} the call site value */
-    private final mod.agus.jcoderz.dx.rop.cst.CstCallSite value;
+  /** {@code non-null;} the call site value */
+  private final mod.agus.jcoderz.dx.rop.cst.CstCallSite value;
 
-    /** {@code null-ok;} the encoded representation of the call site value */
-    private byte[] encodedForm;
+  /** {@code null-ok;} the encoded representation of the call site value */
+  private byte[] encodedForm;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param value {@code non-null;} the string value
-     */
-    public CallSiteItem(mod.agus.jcoderz.dx.rop.cst.CstCallSite value) {
-        super(1, writeSize(value));
+  /**
+   * Constructs an instance.
+   *
+   * @param value {@code non-null;} the string value
+   */
+  public CallSiteItem(mod.agus.jcoderz.dx.rop.cst.CstCallSite value) {
+    super(1, writeSize(value));
 
-        this.value = value;
+    this.value = value;
+  }
+
+  /**
+   * Gets the write size for a given value.
+   *
+   * @param value {@code non-null;} the call site value
+   * @return {@code >= 2}; the write size, in bytes
+   */
+  private static int writeSize(CstCallSite value) {
+    return -1;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected void place0(Section addedTo, int offset) {
+    // Encode the data and note the size.
+
+    mod.agus.jcoderz.dx.util.ByteArrayAnnotatedOutput out = new ByteArrayAnnotatedOutput();
+    ValueEncoder encoder = new ValueEncoder(addedTo.getFile(), out);
+
+    encoder.writeArray(value, true);
+    encodedForm = out.toByteArray();
+    setWriteSize(encodedForm.length);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toHuman() {
+    return value.toHuman();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String toString() {
+    return value.toString();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  protected void writeTo0(DexFile file, AnnotatedOutput out) {
+    if (out.annotates()) {
+      out.annotate(0, offsetString() + " call site");
+      ValueEncoder encoder = new ValueEncoder(file, out);
+      encoder.writeArray(value, true);
+    } else {
+      out.write(encodedForm);
     }
+  }
 
-    /**
-     * Gets the write size for a given value.
-     *
-     * @param value {@code non-null;} the call site value
-     * @return {@code >= 2}; the write size, in bytes
-     */
-    private static int writeSize(CstCallSite value) {
-        return -1;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public ItemType itemType() {
+    // A call site is an encoded array with additional constraints
+    // on the element kinds. It is not listed separately in the
+    // DEX file's table of contents.
+    return ItemType.TYPE_ENCODED_ARRAY_ITEM;
+  }
 
-    /** {@inheritDoc} */
-    @Override
-    protected void place0(Section addedTo, int offset) {
-        // Encode the data and note the size.
-
-        mod.agus.jcoderz.dx.util.ByteArrayAnnotatedOutput out = new ByteArrayAnnotatedOutput();
-        ValueEncoder encoder = new ValueEncoder(addedTo.getFile(), out);
-
-        encoder.writeArray(value, true);
-        encodedForm = out.toByteArray();
-        setWriteSize(encodedForm.length);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toHuman() {
-        return value.toHuman();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String toString() {
-        return value.toString();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void writeTo0(DexFile file, AnnotatedOutput out) {
-        if (out.annotates()) {
-            out.annotate(0, offsetString() + " call site");
-            ValueEncoder encoder = new ValueEncoder(file, out);
-            encoder.writeArray(value, true);
-        } else {
-            out.write(encodedForm);
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ItemType itemType() {
-        // A call site is an encoded array with additional constraints
-        // on the element kinds. It is not listed separately in the
-        // DEX file's table of contents.
-        return ItemType.TYPE_ENCODED_ARRAY_ITEM;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void addContents(DexFile file) {
-        ValueEncoder.addContents(file, value);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public void addContents(DexFile file) {
+    ValueEncoder.addContents(file, value);
+  }
 }

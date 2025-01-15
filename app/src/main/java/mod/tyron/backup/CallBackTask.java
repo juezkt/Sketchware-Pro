@@ -2,9 +2,9 @@ package mod.tyron.backup;
 
 public interface CallBackTask {
 
-    void onCopyPreExecute();
+  void onCopyPreExecute();
 
-    void onCopyProgressUpdate(int progress);
+  void onCopyProgressUpdate(int progress);
 
-    void onCopyPostExecute(String path, boolean wasSuccessful, String reason);
+  void onCopyPostExecute(String path, boolean wasSuccessful, String reason);
 }

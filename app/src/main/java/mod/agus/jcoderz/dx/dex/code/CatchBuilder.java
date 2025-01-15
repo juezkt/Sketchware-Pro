@@ -17,32 +17,28 @@
 package mod.agus.jcoderz.dx.dex.code;
 
 import java.util.HashSet;
-
 import mod.agus.jcoderz.dx.rop.type.Type;
 
-/**
- * Interface for the construction of {@link mod.agus.jcoderz.dx.dex.code.CatchTable} instances.
- */
+/** Interface for the construction of {@link mod.agus.jcoderz.dx.dex.code.CatchTable} instances. */
 public interface CatchBuilder {
-    /**
-     * Builds and returns the catch table for this instance.
-     *
-     * @return {@code non-null;} the constructed table
-     */
-    public CatchTable build();
+  /**
+   * Builds and returns the catch table for this instance.
+   *
+   * @return {@code non-null;} the constructed table
+   */
+  public CatchTable build();
 
-    /**
-     * Gets whether this instance has any catches at all (either typed
-     * or catch-all).
-     *
-     * @return whether this instance has any catches at all
-     */
-    public boolean hasAnyCatches();
+  /**
+   * Gets whether this instance has any catches at all (either typed or catch-all).
+   *
+   * @return whether this instance has any catches at all
+   */
+  public boolean hasAnyCatches();
 
-    /**
-     * Gets the set of catch types associated with this instance.
-     *
-     * @return {@code non-null;} the set of catch types
-     */
-    public HashSet<Type> getCatchTypes();
+  /**
+   * Gets the set of catch types associated with this instance.
+   *
+   * @return {@code non-null;} the set of catch types
+   */
+  public HashSet<Type> getCatchTypes();
 }

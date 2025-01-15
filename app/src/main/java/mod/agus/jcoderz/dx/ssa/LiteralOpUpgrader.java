@@ -18,7 +18,6 @@ package mod.agus.jcoderz.dx.ssa;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import mod.agus.jcoderz.dx.rop.code.Insn;
 import mod.agus.jcoderz.dx.rop.code.PlainCstInsn;
 import mod.agus.jcoderz.dx.rop.code.PlainInsn;
@@ -34,177 +33,185 @@ import mod.agus.jcoderz.dx.rop.type.Type;
 import mod.agus.jcoderz.dx.rop.type.TypeBearer;
 
 /**
- * Upgrades insn to their literal (constant-immediate) equivalent if possible.
- * Also switches IF instructions that compare with a constant zero or null
- * to be their IF_*Z equivalents.
+ * Upgrades insn to their literal (constant-immediate) equivalent if possible. Also switches IF
+ * instructions that compare with a constant zero or null to be their IF_*Z equivalents.
  */
 public class LiteralOpUpgrader {
 
-    /** method we're processing */
-    private final mod.agus.jcoderz.dx.ssa.SsaMethod ssaMeth;
+  /** method we're processing */
+  private final mod.agus.jcoderz.dx.ssa.SsaMethod ssaMeth;
 
-    /**
-     * Process a method.
-     *
-     * @param ssaMethod {@code non-null;} method to process
-     */
-    public static void process(mod.agus.jcoderz.dx.ssa.SsaMethod ssaMethod) {
-        LiteralOpUpgrader dc;
+  /**
+   * Process a method.
+   *
+   * @param ssaMethod {@code non-null;} method to process
+   */
+  public static void process(mod.agus.jcoderz.dx.ssa.SsaMethod ssaMethod) {
+    LiteralOpUpgrader dc;
 
-        dc = new LiteralOpUpgrader(ssaMethod);
+    dc = new LiteralOpUpgrader(ssaMethod);
 
-        dc.run();
+    dc.run();
+  }
+
+  private LiteralOpUpgrader(SsaMethod ssaMethod) {
+    this.ssaMeth = ssaMethod;
+  }
+
+  /**
+   * Returns true if the register contains an integer 0 or a known-null object reference
+   *
+   * @param spec non-null spec
+   * @return true for 0 or null type bearers
+   */
+  private static boolean isConstIntZeroOrKnownNull(mod.agus.jcoderz.dx.rop.code.RegisterSpec spec) {
+    mod.agus.jcoderz.dx.rop.type.TypeBearer tb = spec.getTypeBearer();
+    if (tb instanceof mod.agus.jcoderz.dx.rop.cst.CstLiteralBits) {
+      mod.agus.jcoderz.dx.rop.cst.CstLiteralBits clb = (CstLiteralBits) tb;
+      return (clb.getLongBits() == 0);
     }
+    return false;
+  }
 
-    private LiteralOpUpgrader(SsaMethod ssaMethod) {
-        this.ssaMeth = ssaMethod;
-    }
+  /** Run the literal op upgrader */
+  private void run() {
+    final TranslationAdvice advice = Optimizer.getAdvice();
 
-    /**
-     * Returns true if the register contains an integer 0 or a known-null
-     * object reference
-     *
-     * @param spec non-null spec
-     * @return true for 0 or null type bearers
-     */
-    private static boolean isConstIntZeroOrKnownNull(mod.agus.jcoderz.dx.rop.code.RegisterSpec spec) {
-        mod.agus.jcoderz.dx.rop.type.TypeBearer tb = spec.getTypeBearer();
-        if (tb instanceof mod.agus.jcoderz.dx.rop.cst.CstLiteralBits) {
-            mod.agus.jcoderz.dx.rop.cst.CstLiteralBits clb = (CstLiteralBits) tb;
-            return (clb.getLongBits() == 0);
-        }
-        return false;
-    }
+    ssaMeth.forEachInsn(
+        new mod.agus.jcoderz.dx.ssa.SsaInsn.Visitor() {
+          @Override
+          public void visitMoveInsn(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn) {
+            // do nothing
+          }
 
-    /**
-     * Run the literal op upgrader
-     */
-    private void run() {
-        final TranslationAdvice advice = Optimizer.getAdvice();
+          @Override
+          public void visitPhiInsn(PhiInsn insn) {
+            // do nothing
+          }
 
-        ssaMeth.forEachInsn(new mod.agus.jcoderz.dx.ssa.SsaInsn.Visitor() {
-            @Override
-            public void visitMoveInsn(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn) {
-                // do nothing
+          @Override
+          public void visitNonMoveInsn(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn) {
+
+            mod.agus.jcoderz.dx.rop.code.Insn originalRopInsn = insn.getOriginalRopInsn();
+            mod.agus.jcoderz.dx.rop.code.Rop opcode = originalRopInsn.getOpcode();
+            mod.agus.jcoderz.dx.rop.code.RegisterSpecList sources = insn.getSources();
+
+            // Replace insns with constant results with const insns
+            if (tryReplacingWithConstant(insn)) return;
+
+            if (sources.size() != 2) {
+              // We're only dealing with two-source insns here.
+              return;
             }
 
-            @Override
-            public void visitPhiInsn(PhiInsn insn) {
-                // do nothing
+            if (opcode.getBranchingness() == mod.agus.jcoderz.dx.rop.code.Rop.BRANCH_IF) {
+              /*
+               * An if instruction can become an if-*z instruction.
+               */
+              if (isConstIntZeroOrKnownNull(sources.get(0))) {
+                replacePlainInsn(
+                    insn,
+                    sources.withoutFirst(),
+                    mod.agus.jcoderz.dx.rop.code.RegOps.flippedIfOpcode(opcode.getOpcode()),
+                    null);
+              } else if (isConstIntZeroOrKnownNull(sources.get(1))) {
+                replacePlainInsn(insn, sources.withoutLast(), opcode.getOpcode(), null);
+              }
+            } else if (advice.hasConstantOperation(opcode, sources.get(0), sources.get(1))) {
+              insn.upgradeToLiteral();
+            } else if (opcode.isCommutative()
+                && advice.hasConstantOperation(opcode, sources.get(1), sources.get(0))) {
+              /*
+               * An instruction can be commuted to a literal operation
+               */
+
+              insn.setNewSources(
+                  mod.agus.jcoderz.dx.rop.code.RegisterSpecList.make(
+                      sources.get(1), sources.get(0)));
+
+              insn.upgradeToLiteral();
             }
-
-            @Override
-            public void visitNonMoveInsn(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn) {
-
-                mod.agus.jcoderz.dx.rop.code.Insn originalRopInsn = insn.getOriginalRopInsn();
-                mod.agus.jcoderz.dx.rop.code.Rop opcode = originalRopInsn.getOpcode();
-                mod.agus.jcoderz.dx.rop.code.RegisterSpecList sources = insn.getSources();
-
-                // Replace insns with constant results with const insns
-                if (tryReplacingWithConstant(insn)) return;
-
-                if (sources.size() != 2 ) {
-                    // We're only dealing with two-source insns here.
-                    return;
-                }
-
-                if (opcode.getBranchingness() == mod.agus.jcoderz.dx.rop.code.Rop.BRANCH_IF) {
-                    /*
-                     * An if instruction can become an if-*z instruction.
-                     */
-                    if (isConstIntZeroOrKnownNull(sources.get(0))) {
-                        replacePlainInsn(insn, sources.withoutFirst(),
-                              mod.agus.jcoderz.dx.rop.code.RegOps.flippedIfOpcode(opcode.getOpcode()), null);
-                    } else if (isConstIntZeroOrKnownNull(sources.get(1))) {
-                        replacePlainInsn(insn, sources.withoutLast(),
-                              opcode.getOpcode(), null);
-                    }
-                } else if (advice.hasConstantOperation(
-                        opcode, sources.get(0), sources.get(1))) {
-                    insn.upgradeToLiteral();
-                } else  if (opcode.isCommutative()
-                        && advice.hasConstantOperation(
-                        opcode, sources.get(1), sources.get(0))) {
-                    /*
-                     * An instruction can be commuted to a literal operation
-                     */
-
-                    insn.setNewSources(
-                            mod.agus.jcoderz.dx.rop.code.RegisterSpecList.make(
-                                    sources.get(1), sources.get(0)));
-
-                    insn.upgradeToLiteral();
-                }
-            }
+          }
         });
-    }
+  }
 
-    /**
-     * Tries to replace an instruction with a const instruction. The given
-     * instruction must have a constant result for it to be replaced.
-     *
-     * @param insn {@code non-null;} instruction to try to replace
-     * @return true if the instruction was replaced
-     */
-    private boolean tryReplacingWithConstant(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn) {
-        mod.agus.jcoderz.dx.rop.code.Insn originalRopInsn = insn.getOriginalRopInsn();
-        mod.agus.jcoderz.dx.rop.code.Rop opcode = originalRopInsn.getOpcode();
-        RegisterSpec result = insn.getResult();
+  /**
+   * Tries to replace an instruction with a const instruction. The given instruction must have a
+   * constant result for it to be replaced.
+   *
+   * @param insn {@code non-null;} instruction to try to replace
+   * @return true if the instruction was replaced
+   */
+  private boolean tryReplacingWithConstant(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn) {
+    mod.agus.jcoderz.dx.rop.code.Insn originalRopInsn = insn.getOriginalRopInsn();
+    mod.agus.jcoderz.dx.rop.code.Rop opcode = originalRopInsn.getOpcode();
+    RegisterSpec result = insn.getResult();
 
-        if (result != null && !ssaMeth.isRegALocal(result) &&
-                opcode.getOpcode() != mod.agus.jcoderz.dx.rop.code.RegOps.CONST) {
-            TypeBearer type = insn.getResult().getTypeBearer();
-            if (type.isConstant() && type.getBasicType() == Type.BT_INT) {
-                // Replace the instruction with a constant
-                replacePlainInsn(insn, mod.agus.jcoderz.dx.rop.code.RegisterSpecList.EMPTY,
-                        mod.agus.jcoderz.dx.rop.code.RegOps.CONST, (mod.agus.jcoderz.dx.rop.cst.Constant) type);
+    if (result != null
+        && !ssaMeth.isRegALocal(result)
+        && opcode.getOpcode() != mod.agus.jcoderz.dx.rop.code.RegOps.CONST) {
+      TypeBearer type = insn.getResult().getTypeBearer();
+      if (type.isConstant() && type.getBasicType() == Type.BT_INT) {
+        // Replace the instruction with a constant
+        replacePlainInsn(
+            insn,
+            mod.agus.jcoderz.dx.rop.code.RegisterSpecList.EMPTY,
+            mod.agus.jcoderz.dx.rop.code.RegOps.CONST,
+            (mod.agus.jcoderz.dx.rop.cst.Constant) type);
 
-                // Remove the source as well if this is a move-result-pseudo
-                if (opcode.getOpcode() == mod.agus.jcoderz.dx.rop.code.RegOps.MOVE_RESULT_PSEUDO) {
-                    int pred = insn.getBlock().getPredecessors().nextSetBit(0);
-                    ArrayList<mod.agus.jcoderz.dx.ssa.SsaInsn> predInsns =
-                            ssaMeth.getBlocks().get(pred).getInsns();
-                    mod.agus.jcoderz.dx.ssa.NormalSsaInsn sourceInsn =
-                            (mod.agus.jcoderz.dx.ssa.NormalSsaInsn) predInsns.get(predInsns.size()-1);
-                    replacePlainInsn(sourceInsn, mod.agus.jcoderz.dx.rop.code.RegisterSpecList.EMPTY,
-                            mod.agus.jcoderz.dx.rop.code.RegOps.GOTO, null);
-                }
-                return true;
-            }
+        // Remove the source as well if this is a move-result-pseudo
+        if (opcode.getOpcode() == mod.agus.jcoderz.dx.rop.code.RegOps.MOVE_RESULT_PSEUDO) {
+          int pred = insn.getBlock().getPredecessors().nextSetBit(0);
+          ArrayList<mod.agus.jcoderz.dx.ssa.SsaInsn> predInsns =
+              ssaMeth.getBlocks().get(pred).getInsns();
+          mod.agus.jcoderz.dx.ssa.NormalSsaInsn sourceInsn =
+              (mod.agus.jcoderz.dx.ssa.NormalSsaInsn) predInsns.get(predInsns.size() - 1);
+          replacePlainInsn(
+              sourceInsn,
+              mod.agus.jcoderz.dx.rop.code.RegisterSpecList.EMPTY,
+              mod.agus.jcoderz.dx.rop.code.RegOps.GOTO,
+              null);
         }
-        return false;
+        return true;
+      }
     }
+    return false;
+  }
 
-    /**
-     * Replaces an SsaInsn containing a PlainInsn with a new PlainInsn. The
-     * new PlainInsn is constructed with a new RegOp and new sources.
-     *
-     * TODO move this somewhere else.
-     *
-     * @param insn {@code non-null;} an SsaInsn containing a PlainInsn
-     * @param newSources {@code non-null;} new sources list for new insn
-     * @param newOpcode A RegOp from {@link RegOps}
-     * @param cst {@code null-ok;} constant for new instruction, if any
-     */
-    private void replacePlainInsn(mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn,
-                                  RegisterSpecList newSources, int newOpcode, Constant cst) {
+  /**
+   * Replaces an SsaInsn containing a PlainInsn with a new PlainInsn. The new PlainInsn is
+   * constructed with a new RegOp and new sources.
+   *
+   * <p>TODO move this somewhere else.
+   *
+   * @param insn {@code non-null;} an SsaInsn containing a PlainInsn
+   * @param newSources {@code non-null;} new sources list for new insn
+   * @param newOpcode A RegOp from {@link RegOps}
+   * @param cst {@code null-ok;} constant for new instruction, if any
+   */
+  private void replacePlainInsn(
+      mod.agus.jcoderz.dx.ssa.NormalSsaInsn insn,
+      RegisterSpecList newSources,
+      int newOpcode,
+      Constant cst) {
 
-        mod.agus.jcoderz.dx.rop.code.Insn originalRopInsn = insn.getOriginalRopInsn();
-        Rop newRop = Rops.ropFor(newOpcode, insn.getResult(), newSources, cst);
-        Insn newRopInsn;
-        if (cst == null) {
-            newRopInsn = new PlainInsn(newRop, originalRopInsn.getPosition(),
-                    insn.getResult(), newSources);
-        } else {
-            newRopInsn = new PlainCstInsn(newRop, originalRopInsn.getPosition(),
-                    insn.getResult(), newSources, cst);
-        }
-        mod.agus.jcoderz.dx.ssa.NormalSsaInsn newInsn = new NormalSsaInsn(newRopInsn, insn.getBlock());
-
-        List<SsaInsn> insns = insn.getBlock().getInsns();
-
-        ssaMeth.onInsnRemoved(insn);
-        insns.set(insns.lastIndexOf(insn), newInsn);
-        ssaMeth.onInsnAdded(newInsn);
+    mod.agus.jcoderz.dx.rop.code.Insn originalRopInsn = insn.getOriginalRopInsn();
+    Rop newRop = Rops.ropFor(newOpcode, insn.getResult(), newSources, cst);
+    Insn newRopInsn;
+    if (cst == null) {
+      newRopInsn =
+          new PlainInsn(newRop, originalRopInsn.getPosition(), insn.getResult(), newSources);
+    } else {
+      newRopInsn =
+          new PlainCstInsn(
+              newRop, originalRopInsn.getPosition(), insn.getResult(), newSources, cst);
     }
+    mod.agus.jcoderz.dx.ssa.NormalSsaInsn newInsn = new NormalSsaInsn(newRopInsn, insn.getBlock());
+
+    List<SsaInsn> insns = insn.getBlock().getInsns();
+
+    ssaMeth.onInsnRemoved(insn);
+    insns.set(insns.lastIndexOf(insn), newInsn);
+    ssaMeth.onInsnAdded(newInsn);
+  }
 }

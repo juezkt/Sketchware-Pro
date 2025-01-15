@@ -5,11 +5,11 @@ import com.besome.sketch.beans.ViewBean;
 // todo: move this to another package
 // 'sy' is used in ViewPane items, example ItemLinearLayout
 public interface sy {
-    ViewBean getBean();
+  ViewBean getBean();
 
-    boolean getFixed();
+  boolean getFixed();
 
-    void setBean(ViewBean viewBean);
+  void setBean(ViewBean viewBean);
 
-    void setSelection(boolean selection);
+  void setSelection(boolean selection);
 }

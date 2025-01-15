@@ -19,56 +19,52 @@ package mod.agus.jcoderz.dx.cf.code;
 import mod.agus.jcoderz.dx.util.Hex;
 import mod.agus.jcoderz.dx.util.LabeledList;
 
-/**
- * List of {@link mod.agus.jcoderz.dx.cf.code.ByteBlock} instances.
- */
+/** List of {@link mod.agus.jcoderz.dx.cf.code.ByteBlock} instances. */
 public final class ByteBlockList extends LabeledList {
 
-    /**
-     * Constructs an instance.
-     *
-     * @param size {@code >= 0;} the number of elements to be in the list
-     */
-    public ByteBlockList(int size) {
-        super(size);
+  /**
+   * Constructs an instance.
+   *
+   * @param size {@code >= 0;} the number of elements to be in the list
+   */
+  public ByteBlockList(int size) {
+    super(size);
+  }
+
+  /**
+   * Gets the indicated element. It is an error to call this with the index for an element which was
+   * never set; if you do that, this will throw {@code NullPointerException}.
+   *
+   * @param n {@code >= 0, < size();} which element
+   * @return {@code non-null;} the indicated element
+   */
+  public mod.agus.jcoderz.dx.cf.code.ByteBlock get(int n) {
+    return (mod.agus.jcoderz.dx.cf.code.ByteBlock) get0(n);
+  }
+
+  /**
+   * Gets the block with the given label.
+   *
+   * @param label the label to look for
+   * @return {@code non-null;} the block with the given label
+   */
+  public mod.agus.jcoderz.dx.cf.code.ByteBlock labelToBlock(int label) {
+    int idx = indexOfLabel(label);
+
+    if (idx < 0) {
+      throw new IllegalArgumentException("no such label: " + Hex.u2(label));
     }
 
-    /**
-     * Gets the indicated element. It is an error to call this with the
-     * index for an element which was never set; if you do that, this
-     * will throw {@code NullPointerException}.
-     *
-     * @param n {@code >= 0, < size();} which element
-     * @return {@code non-null;} the indicated element
-     */
-    public mod.agus.jcoderz.dx.cf.code.ByteBlock get(int n) {
-        return (mod.agus.jcoderz.dx.cf.code.ByteBlock) get0(n);
-    }
+    return get(idx);
+  }
 
-    /**
-     * Gets the block with the given label.
-     *
-     * @param label the label to look for
-     * @return {@code non-null;} the block with the given label
-     */
-    public mod.agus.jcoderz.dx.cf.code.ByteBlock labelToBlock(int label) {
-        int idx = indexOfLabel(label);
-
-        if (idx < 0) {
-            throw new IllegalArgumentException("no such label: "
-                    + Hex.u2(label));
-        }
-
-        return get(idx);
-    }
-
-    /**
-     * Sets the element at the given index.
-     *
-     * @param n {@code >= 0, < size();} which element
-     * @param bb {@code null-ok;} the value to store
-     */
-    public void set(int n, ByteBlock bb) {
-        super.set(n, bb);
-    }
+  /**
+   * Sets the element at the given index.
+   *
+   * @param n {@code >= 0, < size();} which element
+   * @param bb {@code null-ok;} the value to store
+   */
+  public void set(int n, ByteBlock bb) {
+    super.set(n, bb);
+  }
 }

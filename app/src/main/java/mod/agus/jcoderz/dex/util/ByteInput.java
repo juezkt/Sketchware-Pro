@@ -16,15 +16,13 @@
 
 package mod.agus.jcoderz.dex.util;
 
-/**
- * A byte source.
- */
+/** A byte source. */
 public interface ByteInput {
 
-    /**
-     * Returns a byte.
-     *
-     * @throws IndexOutOfBoundsException if all bytes have been read.
-     */
-    byte readByte();
+  /**
+   * Returns a byte.
+   *
+   * @throws IndexOutOfBoundsException if all bytes have been read.
+   */
+  byte readByte();
 }

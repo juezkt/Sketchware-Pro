@@ -18,16 +18,13 @@ package mod.agus.jcoderz.dex;
 
 import mod.agus.jcoderz.dex.util.ExceptionWithContext;
 
-/**
- * Thrown when there's a format problem reading, writing, or generally
- * processing a dex file.
- */
+/** Thrown when there's a format problem reading, writing, or generally processing a dex file. */
 public class DexException extends ExceptionWithContext {
-    public DexException(String message) {
-        super(message);
-    }
+  public DexException(String message) {
+    super(message);
+  }
 
-    public DexException(Throwable cause) {
-        super(cause);
-    }
+  public DexException(Throwable cause) {
+    super(cause);
+  }
 }

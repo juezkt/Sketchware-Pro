@@ -18,45 +18,43 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.rop.cst.CstString;
 
-/**
- * Attribute class for standard {@code SourceDebugExtension} attributes.
- */
+/** Attribute class for standard {@code SourceDebugExtension} attributes. */
 public final class AttSourceDebugExtension extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "SourceDebugExtension";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "SourceDebugExtension";
 
-    /** {@code non-null;} Contents of SMAP */
-    private final mod.agus.jcoderz.dx.rop.cst.CstString smapString;
+  /** {@code non-null;} Contents of SMAP */
+  private final mod.agus.jcoderz.dx.rop.cst.CstString smapString;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param smapString {@code non-null;} the SMAP data from the class file.
-     */
-    public AttSourceDebugExtension(mod.agus.jcoderz.dx.rop.cst.CstString smapString) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param smapString {@code non-null;} the SMAP data from the class file.
+   */
+  public AttSourceDebugExtension(mod.agus.jcoderz.dx.rop.cst.CstString smapString) {
+    super(ATTRIBUTE_NAME);
 
-        if (smapString == null) {
-            throw new NullPointerException("smapString == null");
-        }
-
-        this.smapString = smapString;
+    if (smapString == null) {
+      throw new NullPointerException("smapString == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        // Add 6 for the standard attribute header: the attribute name
-        // index (2 bytes) and the attribute length (4 bytes).
-        return 6 + smapString.getUtf8Size();
-    }
+    this.smapString = smapString;
+  }
 
-    /**
-     * Gets the SMAP data of this instance.
-     *
-     * @return {@code non-null;} the SMAP data.
-     */
-    public CstString getSmapString() {
-        return smapString;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    // Add 6 for the standard attribute header: the attribute name
+    // index (2 bytes) and the attribute length (4 bytes).
+    return 6 + smapString.getUtf8Size();
+  }
+
+  /**
+   * Gets the SMAP data of this instance.
+   *
+   * @return {@code non-null;} the SMAP data.
+   */
+  public CstString getSmapString() {
+    return smapString;
+  }
 }

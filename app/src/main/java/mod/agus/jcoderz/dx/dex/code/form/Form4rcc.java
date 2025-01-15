@@ -19,102 +19,95 @@ package mod.agus.jcoderz.dx.dex.code.form;
 import mod.agus.jcoderz.dx.dex.code.DalvInsn;
 import mod.agus.jcoderz.dx.dex.code.InsnFormat;
 import mod.agus.jcoderz.dx.dex.code.MultiCstInsn;
-import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 import mod.agus.jcoderz.dx.rop.code.RegisterSpecList;
 import mod.agus.jcoderz.dx.rop.cst.Constant;
 import mod.agus.jcoderz.dx.rop.cst.CstMethodRef;
 import mod.agus.jcoderz.dx.rop.cst.CstProtoRef;
+import mod.agus.jcoderz.dx.util.AnnotatedOutput;
 
-/**
- * Instruction format {@code 4rcc}. See the instruction format spec
- * for details.
- */
+/** Instruction format {@code 4rcc}. See the instruction format spec for details. */
 public final class Form4rcc extends InsnFormat {
-    /** {@code non-null;} unique instance of this class */
-    public static final InsnFormat THE_ONE = new Form4rcc();
+  /** {@code non-null;} unique instance of this class */
+  public static final InsnFormat THE_ONE = new Form4rcc();
 
-    /**
-     * Constructs an instance. This class is not publicly
-     * instantiable. Use {@link #THE_ONE}.
-     */
-    private Form4rcc() {
-        // This space intentionally left blank.
+  /** Constructs an instance. This class is not publicly instantiable. Use {@link #THE_ONE}. */
+  private Form4rcc() {
+    // This space intentionally left blank.
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String insnArgString(DalvInsn insn) {
+    return regRangeString(insn.getRegisters()) + ", " + insn.cstString();
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String insnCommentString(DalvInsn insn, boolean noteIndices) {
+    if (noteIndices) {
+      return insn.cstComment();
+    } else {
+      return "";
+    }
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public int codeSize() {
+    return 4;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public boolean isCompatible(DalvInsn insn) {
+    if (!(insn instanceof MultiCstInsn)) {
+      return false;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String insnArgString(DalvInsn insn) {
-        return regRangeString(insn.getRegisters()) + ", " +
-            insn.cstString();
+    MultiCstInsn mci = (MultiCstInsn) insn;
+    int methodIdx = mci.getIndex(0);
+    int protoIdx = mci.getIndex(1);
+    if (!unsignedFitsInShort(methodIdx) || !unsignedFitsInShort(protoIdx)) {
+      return false;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public String insnCommentString(DalvInsn insn, boolean noteIndices) {
-        if (noteIndices) {
-            return insn.cstComment();
-        } else {
-            return "";
-        }
+    mod.agus.jcoderz.dx.rop.cst.Constant methodRef = mci.getConstant(0);
+    if (!(methodRef instanceof CstMethodRef)) {
+      return false;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int codeSize() {
-        return 4;
+    Constant protoRef = mci.getConstant(1);
+    if (!(protoRef instanceof CstProtoRef)) {
+      return false;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean isCompatible(DalvInsn insn) {
-        if (!(insn instanceof MultiCstInsn)) {
-            return false;
-        }
-
-        MultiCstInsn mci = (MultiCstInsn) insn;
-        int methodIdx = mci.getIndex(0);
-        int protoIdx = mci.getIndex(1);
-        if (!unsignedFitsInShort(methodIdx) || !unsignedFitsInShort(protoIdx)) {
-            return false;
-        }
-
-        mod.agus.jcoderz.dx.rop.cst.Constant methodRef = mci.getConstant(0);
-        if (!(methodRef instanceof CstMethodRef)) {
-            return false;
-        }
-
-        Constant protoRef = mci.getConstant(1);
-        if (!(protoRef instanceof CstProtoRef)) {
-            return false;
-        }
-
-        mod.agus.jcoderz.dx.rop.code.RegisterSpecList regs = mci.getRegisters();
-        int sz = regs.size();
-        if (sz == 0) {
-            return true;
-        }
-
-        return (unsignedFitsInByte(regs.getWordCount()) &&
-                unsignedFitsInShort(sz) &&
-                unsignedFitsInShort(regs.get(0).getReg()) &&
-                isRegListSequential(regs));
+    mod.agus.jcoderz.dx.rop.code.RegisterSpecList regs = mci.getRegisters();
+    int sz = regs.size();
+    if (sz == 0) {
+      return true;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void writeTo(AnnotatedOutput out, DalvInsn insn) {
-        MultiCstInsn mci = (MultiCstInsn) insn;
-        short regB = (short) mci.getIndex(0);  // B is the method index
-        short regH = (short) mci.getIndex(1);  // H is the call site proto index
+    return (unsignedFitsInByte(regs.getWordCount())
+        && unsignedFitsInShort(sz)
+        && unsignedFitsInShort(regs.get(0).getReg())
+        && isRegListSequential(regs));
+  }
 
-        RegisterSpecList regs = insn.getRegisters();
-        short regC = 0;
-        if (regs.size() > 0) {
-            regC = (short) regs.get(0).getReg();
-        }
-        int regA = regs.getWordCount();
+  /** {@inheritDoc} */
+  @Override
+  public void writeTo(AnnotatedOutput out, DalvInsn insn) {
+    MultiCstInsn mci = (MultiCstInsn) insn;
+    short regB = (short) mci.getIndex(0); // B is the method index
+    short regH = (short) mci.getIndex(1); // H is the call site proto index
 
-        // The output format is: AA|op BBBB CCCC HHHH
-        write(out, opcodeUnit(insn,regA), regB, regC, regH);
+    RegisterSpecList regs = insn.getRegisters();
+    short regC = 0;
+    if (regs.size() > 0) {
+      regC = (short) regs.get(0).getReg();
     }
+    int regA = regs.getWordCount();
+
+    // The output format is: AA|op BBBB CCCC HHHH
+    write(out, opcodeUnit(insn, regA), regB, regC, regH);
+  }
 }

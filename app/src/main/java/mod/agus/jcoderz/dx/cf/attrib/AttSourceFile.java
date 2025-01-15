@@ -18,43 +18,41 @@ package mod.agus.jcoderz.dx.cf.attrib;
 
 import mod.agus.jcoderz.dx.rop.cst.CstString;
 
-/**
- * Attribute class for standard {@code SourceFile} attributes.
- */
+/** Attribute class for standard {@code SourceFile} attributes. */
 public final class AttSourceFile extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "SourceFile";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "SourceFile";
 
-    /** {@code non-null;} name of the source file */
-    private final mod.agus.jcoderz.dx.rop.cst.CstString sourceFile;
+  /** {@code non-null;} name of the source file */
+  private final mod.agus.jcoderz.dx.rop.cst.CstString sourceFile;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param sourceFile {@code non-null;} the name of the source file
-     */
-    public AttSourceFile(mod.agus.jcoderz.dx.rop.cst.CstString sourceFile) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param sourceFile {@code non-null;} the name of the source file
+   */
+  public AttSourceFile(mod.agus.jcoderz.dx.rop.cst.CstString sourceFile) {
+    super(ATTRIBUTE_NAME);
 
-        if (sourceFile == null) {
-            throw new NullPointerException("sourceFile == null");
-        }
-
-        this.sourceFile = sourceFile;
+    if (sourceFile == null) {
+      throw new NullPointerException("sourceFile == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return 8;
-    }
+    this.sourceFile = sourceFile;
+  }
 
-    /**
-     * Gets the source file name of this instance.
-     *
-     * @return {@code non-null;} the source file
-     */
-    public CstString getSourceFile() {
-        return sourceFile;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return 8;
+  }
+
+  /**
+   * Gets the source file name of this instance.
+   *
+   * @return {@code non-null;} the source file
+   */
+  public CstString getSourceFile() {
+    return sourceFile;
+  }
 }

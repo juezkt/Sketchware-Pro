@@ -19,51 +19,48 @@ package mod.agus.jcoderz.dx.cf.attrib;
 import mod.agus.jcoderz.dx.rop.type.TypeList;
 import mod.agus.jcoderz.dx.util.MutabilityException;
 
-/**
- * Attribute class for standard {@code Exceptions} attributes.
- */
+/** Attribute class for standard {@code Exceptions} attributes. */
 public final class AttExceptions extends BaseAttribute {
-    /** {@code non-null;} attribute name for attributes of this type */
-    public static final String ATTRIBUTE_NAME = "Exceptions";
+  /** {@code non-null;} attribute name for attributes of this type */
+  public static final String ATTRIBUTE_NAME = "Exceptions";
 
-    /** {@code non-null;} list of exception classes */
-    private final mod.agus.jcoderz.dx.rop.type.TypeList exceptions;
+  /** {@code non-null;} list of exception classes */
+  private final mod.agus.jcoderz.dx.rop.type.TypeList exceptions;
 
-    /**
-     * Constructs an instance.
-     *
-     * @param exceptions {@code non-null;} list of classes, presumed but not
-     * verified to be subclasses of {@code Throwable}
-     */
-    public AttExceptions(mod.agus.jcoderz.dx.rop.type.TypeList exceptions) {
-        super(ATTRIBUTE_NAME);
+  /**
+   * Constructs an instance.
+   *
+   * @param exceptions {@code non-null;} list of classes, presumed but not verified to be subclasses
+   *     of {@code Throwable}
+   */
+  public AttExceptions(mod.agus.jcoderz.dx.rop.type.TypeList exceptions) {
+    super(ATTRIBUTE_NAME);
 
-        try {
-            if (exceptions.isMutable()) {
-                throw new MutabilityException("exceptions.isMutable()");
-            }
-        } catch (NullPointerException ex) {
-            // Translate the exception.
-            throw new NullPointerException("exceptions == null");
-        }
-
-        this.exceptions = exceptions;
+    try {
+      if (exceptions.isMutable()) {
+        throw new MutabilityException("exceptions.isMutable()");
+      }
+    } catch (NullPointerException ex) {
+      // Translate the exception.
+      throw new NullPointerException("exceptions == null");
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public int byteLength() {
-        return 8 + exceptions.size() * 2;
-    }
+    this.exceptions = exceptions;
+  }
 
-    /**
-     * Gets the list of classes associated with this instance. In
-     * general, these classes are not pre-verified to be subclasses of
-     * {@code Throwable}.
-     *
-     * @return {@code non-null;} the list of classes
-     */
-    public TypeList getExceptions() {
-        return exceptions;
-    }
+  /** {@inheritDoc} */
+  @Override
+  public int byteLength() {
+    return 8 + exceptions.size() * 2;
+  }
+
+  /**
+   * Gets the list of classes associated with this instance. In general, these classes are not
+   * pre-verified to be subclasses of {@code Throwable}.
+   *
+   * @return {@code non-null;} the list of classes
+   */
+  public TypeList getExceptions() {
+    return exceptions;
+  }
 }
