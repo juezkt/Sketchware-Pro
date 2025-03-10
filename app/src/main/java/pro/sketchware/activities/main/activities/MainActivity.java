@@ -211,8 +211,8 @@ public class MainActivity extends BasePermissionAppCompatActivity {
         binding.viewPager.setUserInputEnabled(false);
 
         String[] tabTitles = new String[]{
-                getString(R.string.main_tab_title_myproject),
-                getString(R.string.main_tab_title_projects_store)
+                Helper.getResString(R.string.main_tab_title_myproject),
+                Helper.getResString(R.string.main_tab_title_projects_store)
         };
 
         new TabLayoutMediator(binding.tabLayout, binding.viewPager,
@@ -301,7 +301,7 @@ public class MainActivity extends BasePermissionAppCompatActivity {
     @NonNull
     private BottomSheetDialogView getBottomSheetDialogView() {
         BottomSheetDialogView bottomSheetDialog = new BottomSheetDialogView(this);
-        bottomSheetDialog.setTitle("Major changes in v6.4.0");
+        bottomSheetDialog.setTitle("Major changes in v7.0.0");
         bottomSheetDialog.setDescription("""
                 There have been major changes since v6.3.0 fix1, \
                 and it's very important to know them all if you want your projects to still work.

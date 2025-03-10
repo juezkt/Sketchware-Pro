@@ -41,7 +41,7 @@ import mod.hey.studios.editor.manage.block.v2.BlockLoader;
 import mod.hey.studios.util.Helper;
 
 import pro.sketchware.R;
-import pro.sketchware.databinding.BlocksManagerBinding;
+import pro.sketchware.databinding.ActivityBlocksManagerBinding;
 import pro.sketchware.databinding.DialogBlockConfigurationBinding;
 import pro.sketchware.databinding.DialogPaletteBinding;
 import pro.sketchware.databinding.PalletCustomviewBinding;
@@ -69,7 +69,7 @@ public class BlocksManager extends BaseAppCompatActivity {
     private ArrayList<HashMap<String, Object>> pallet_listmap = new ArrayList<>();
     private ItemTouchHelper itemTouchHelper;
     boolean isDialogShowing;
-    private BlocksManagerBinding binding;
+    private ActivityBlocksManagerBinding binding;
     private DialogPaletteBinding dialogBinding;
     private Vibrator vibrator;
     View draggedView;
@@ -77,7 +77,7 @@ public class BlocksManager extends BaseAppCompatActivity {
     @Override
     public void onCreate(Bundle _savedInstanceState) {
         super.onCreate(_savedInstanceState);
-        binding = BlocksManagerBinding.inflate(getLayoutInflater());
+        binding = ActivityBlocksManagerBinding.inflate(getLayoutInflater());
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         setContentView(binding.getRoot());
@@ -105,7 +105,7 @@ public class BlocksManager extends BaseAppCompatActivity {
         binding.fab.setOnClickListener(v -> showPaletteDialog(false, null, null, "#ffffff", null));
 
         readSettings();
-        refresh_list();
+        refreshList();
         recycleBin(binding.recycleBinCard);
 
         itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
@@ -190,6 +190,14 @@ public class BlocksManager extends BaseAppCompatActivity {
         return super.onOptionsItemSelected(menuItem);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        readSettings();
+        refreshList();
+        refreshCount();
+    }
+
     private void showBlockConfigurationDialog() {
         aB dialog = new aB(this);
         dialog.a(R.drawable.ic_folder_48dp);
@@ -207,7 +215,7 @@ public class BlocksManager extends BaseAppCompatActivity {
             ConfigActivity.setSetting(ConfigActivity.SETTING_BLOCKMANAGER_DIRECTORY_BLOCK_FILE_PATH, Objects.requireNonNull(dialogBinding.blocksPath.getText()).toString());
 
             readSettings();
-            refresh_list();
+            refreshList();
             dialog.dismiss();
         });
 
@@ -218,7 +226,7 @@ public class BlocksManager extends BaseAppCompatActivity {
             ConfigActivity.setSetting(ConfigActivity.SETTING_BLOCKMANAGER_DIRECTORY_BLOCK_FILE_PATH, ConfigActivity.getDefaultValue(ConfigActivity.SETTING_BLOCKMANAGER_DIRECTORY_BLOCK_FILE_PATH));
 
             readSettings();
-            refresh_list();
+            refreshList();
             dialog.dismiss();
         });
 
@@ -277,7 +285,7 @@ public class BlocksManager extends BaseAppCompatActivity {
         }
     }
 
-    private void refresh_list() {
+    private void refreshList() {
         parsePaletteJson:
         {
             String paletteJsonContent;
@@ -293,7 +301,7 @@ public class BlocksManager extends BaseAppCompatActivity {
                     // fall-through to shared handler
                 }
 
-                SketchwareUtil.showFailedToParseJsonDialog(this, new File(pallet_dir), "Custom Block Palettes", v -> refresh_list());
+                SketchwareUtil.showFailedToParseJsonDialog(this, new File(pallet_dir), "Custom Block Palettes", v -> refreshList());
             }
             pallet_listmap = new ArrayList<>();
         }
@@ -394,7 +402,7 @@ public class BlocksManager extends BaseAppCompatActivity {
         }
         FileUtil.writeFile(blocks_dir, getGson().toJson(all_blocks_list));
         readSettings();
-        refresh_list();
+        refreshList();
     }
 
     private void moveRelatedBlocksToRecycleBin(final double _p) {
@@ -416,7 +424,7 @@ public class BlocksManager extends BaseAppCompatActivity {
         }
         FileUtil.writeFile(blocks_dir, getGson().toJson(newBlocks));
         readSettings();
-        refresh_list();
+        refreshList();
     }
 
     private void showPaletteDialog(boolean isEditing, Integer oldPosition, String oldName, String oldColor, Integer insertAtPosition) {
@@ -489,13 +497,14 @@ public class BlocksManager extends BaseAppCompatActivity {
                     pallet_listmap.get(oldPosition).put("color", colorInput);
                     FileUtil.writeFile(pallet_dir, getGson().toJson(pallet_listmap));
                     readSettings();
-                    refresh_list();
+                    refreshList();
                 }
+                refreshCount();
                 dialog.dismiss();
             }
         });
 
-        dialog.a(getString(R.string.cancel), v1 -> dialog.dismiss());
+        dialog.a(Helper.getResString(R.string.cancel), v1 -> dialog.dismiss());
         dialog.a(dialogBinding.getRoot());
         dialog.show();
     }

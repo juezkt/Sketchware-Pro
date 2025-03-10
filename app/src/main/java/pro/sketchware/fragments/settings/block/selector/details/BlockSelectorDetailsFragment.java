@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.appbar.MaterialToolbar;
 
+import mod.hey.studios.util.Helper;
 import pro.sketchware.databinding.FragmentBlockSelectorManagerBinding;
 import pro.sketchware.databinding.DialogAddCustomActivityBinding;
 import pro.sketchware.databinding.DialogSelectorActionsBinding;
@@ -51,8 +52,7 @@ public class BlockSelectorDetailsFragment extends qA {
         handleInsetts(binding.getRoot());
 
         adapter = new BlockSelectorDetailsAdapter(
-            (selector, indexA) -> showActionsDialog(indexA),
-            (selector, indexA) -> SketchwareUtil.toast(selectors.get(index).getData().get(indexA))
+          (selector, indexA) -> showActionsDialog(indexA)
         );
         
         adapter.submitList(selectors.get(index).getData());
@@ -71,7 +71,7 @@ public class BlockSelectorDetailsFragment extends qA {
         aB dialog = new aB(requireActivity());
         dialog.b("New Selector Item");
         dialog.b("Create", v -> {
-          String newItem = dialogBinding.activityNameInput.getText().toString();
+            String newItem = Helper.getText(dialogBinding.activityNameInput);
             if (newItem != null && !newItem.isEmpty()) {
                 if (!isEdit) {
                     selectors.get(index).getData().add(newItem);
